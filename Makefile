@@ -1,6 +1,6 @@
 .SUFFIXES: .tex .bib .aux .bbl .dvi .ps .pdf .thy
 
-all:	paper.pdf
+all:	bluesky-paper.pdf
 
 %.pdf:	%.bbl
 	pdflatex $(@:.pdf=)
@@ -16,4 +16,4 @@ all:	paper.pdf
 	sed -e "/\\\\bibliography{references}/ r $(@:-arxiv.tex=.bbl)" -e '/\\bibliography{references}/ d' $(@:-arxiv.tex=.tex) > $@
 
 clean:
-	rm -f paper.{log,aux,out,bbl,blg,dvi,ps,pdf} *-arxiv.tex comment.cut
+	rm -f bluesky-paper.{log,aux,out,bbl,blg,dvi,ps,pdf} *-arxiv.tex comment.cut
