@@ -1,5 +1,8 @@
 .SUFFIXES: .tex .bib .aux .bbl .dvi .ps .pdf .thy
 
+# https://stackoverflow.com/questions/47447369/gnu-make-removing-intermediate-files
+.SECONDARY:
+
 all:	bluesky-paper.pdf
 
 %.pdf:	%.bbl
