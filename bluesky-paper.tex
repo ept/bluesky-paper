@@ -2,7 +2,7 @@
 \setcopyright{none}
 
 \begin{document}
-\title{Bluesky and AT Protocol:\\ A Scalable Foundation for Decentralized Social Media}
+\title{Bluesky and the AT Protocol:\\ A Foundation for Usable Decentralized Social Media}
 \author{Martin Kleppmann}
 \email{martin@kleppmann.com}
 \orcid{0000-0001-7252-6958}
@@ -49,18 +49,49 @@ TODO
 \ccsdesc[500]{Networks~Social media networks}
 \ccsdesc[300]{Social and professional topics~Centralization / decentralization}
 
-\keywords{social media, decentralization, federation}
+\keywords{social media, decentralization, federation, web architecture}
 \maketitle
 
 \section{Introduction}
 
-% Decentralized social media without compromising on user experience
-% without burdening users
-% without the user-facing complexity
+Over the last two decades, social media services have evolved from a fun curiosity into a cornerstone of civic life.
+This development has been accompanied by increasing unease that mainstream ``digital town squares'', such as Twitter/X or Facebook, are under the control of a single corporation, and may change their policies on the whim of their leaders~\cite{Yeung:2023}.
+Their operations are opaque (e.g.\ regarding which content is recommended to users), and their users lack agency over their user experience.
+As a result, there has been increasing interest in decentralized social networks, of which the \emph{fediverse} around the ActivityPub protocol~\cite{ActivityPub} and the Mastodon software~\cite{Mastodon} is perhaps the best known (we review a selection of decentralized social networks in Section~\ref{sec:related-work}).
 
-% "Over the last 13 years, Facebook has evolved from a lifestyle site for college kids into a cornerstone of civic life."
-% "most people do not want to run their own web servers or social network nodes"
-% https://www.wired.com/story/decentralized-social-networks-sound-great-too-bad-theyll-never-work/
+However, decentralization also introduces new challenges.
+For example, in the case of Mastodon, a user needs to choose a server when creating an account.
+This choice is significant because the server name becomes part of the username; migrating to another server implies changing username, and preserving one's followers during such a migration requires the cooperation of the old server.
+If a server is shut down without warning, accounts on that server cannot be recovered~-- a particular risk with volunteer-run servers.
+In principle, a user can host their own server, but only a small fraction of social media users have both the technical skills and the inclination to do so.
+
+The distinction between servers in Mastodon introduces complexity for users that does not exist in centralized services.
+For example, a user viewing a thread of replies in the web interface of one server may see a different set of replies compared to viewing the same thread on another server, because a server only shows those replies that it knows about~\cite{Adida:2022}.
+As another example, when viewing the web profile of an account on another server, clicking the ``follow'' button does not simply follow that account; instead, the user needs to enter the hostname of their own server and be redirected to a URL on their home server before they can follow the account.
+In our opinion, it is undesirable to burden users with such complexity arising from the federated architecture.
+
+In this paper we introduce the \emph{AT Protocol} (atproto), a decentralized foundation for social networking, and \emph{Bluesky}, a Twitter-style social app built upon it.
+A core design goal of atproto and Bluesky is to enable a user experience of the same or better quality as centralized services, while being open and decentralized on a technical level.
+We introduce the user-facing features of Bluesky in Section~\ref{sec:product}, and in Section~\ref{sec:architecture} we explain the underlying systems architecture.
+The AT Protocol is designed such that for every part of the system there are multiple competing operators providing interoperable services, making it easy to switch from one provider to another.
+
+Decentralization alone is not able to solve some of the thorniest problems of social media, such as misinformation, harassment, and hate speech.
+However, by opening up the internals of a service to contributors who are not employees of a particular company, decentralization can enable a marketplace of approaches to these problems.
+For example, Bluesky allows anybody to create custom feeds that can apply arbitrary filtering and content selection methods, and custom client software can access all features of the ``official'' app, including moderation tools.
+Our hope is that this architectural openness will enable communities to develop their own approaches to managing problematic content, without depending on a centralized service operator to implement these features for them.
+
+For example, researchers wanting to identify disinformation campaigns can easily get access to all content being posted, the social graph, and user profiles on Bluesky.
+If they are able construct an algorithm to label suspected disinformation, they can publish their labels in real time for use by other parts of the system, such as custom feed generators or client apps.
+One goal of this paper is therefore to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
+
+
+\section{Bluesky from a User's Point of View}\label{sec:product}
+
+\subsection{Usernames}
+
+\section{The AT Protocol Architecture}\label{sec:architecture}
+
+\section{Related Work}\label{sec:related-work}
 
 % https://activitypub.rocks/
 
