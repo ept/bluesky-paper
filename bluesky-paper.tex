@@ -132,9 +132,47 @@ Additional moderation mechanisms are under discussion~\cite{Moderation}.
 
 \subsection{User Handles}\label{sec:handles}
 
+Like on Twitter, a Bluesky user has two names: the \emph{display name} can be almost any string, and the \emph{handle} needs to uniquely identify a user.
+A handle, prefixed with an @ sign, is used to mention another user in a post.
+Examples can be seen in Figure~\ref{fig:home-feed} (the display name is in bold, and the handle is in a smaller font and lighter color).
+
+The need for handles to be unique creates challenges in decentralized systems, since it requires an authority that determines which handle is assigned to which user.
+Mastodon's approach is to include the server name in the handle, which makes it difficult to move to another server.
+An alternative would be to use a blockchain-based naming system, such as the Ethereum Name System (ENS)~\cite{ENS}; this has the disadvantage of requiring the user to buy cryptocurrency in order to create an account, which we wanted to avoid.
+
+Instead, Bluesky and atproto use DNS domain names as handles.
+If a user already owns a domain name, they can claim it as their Bluesky handle by adding a DNS record or by hosting a file under a \texttt{.well-known} HTTPS URL on that domain~\cite{DomainHandle}.
+Users can also buy a new domain name within Bluesky, via a partnership with a domain registrar~\cite{PurchaseDomain}.
+Alternatively, users can sign up for a subdomain of \texttt{.bsky.social} for free.
+
+Using DNS domain names as handles has several advantages:
+\begin{itemize}
+    \item We leverage the existing infrastructure of ICANN, registrars, and name servers, including for example the dispute resolution procedures for trademarks.
+    \item Domain names are a well-known concept even among non-technical users, and they are short and simple.
+    \item A user can move to a different server without changing their handle.
+    \item Users do not need to host their own server to use their own domain name; a DNS record requires only a one-time setup and no ongoing maintenance.
+    \item For organizations and people that already have a well-known domain name, using that name makes it easy for users to check that their Bluesky account is genuine. For example, the New York Times' handle is \texttt{@nytimes.com}.
+    \item An organization can easily allow their staff to demonstrate their affiliation by granting them handles that are subdomains of the organization's main domain name (comparable to institutional email addresses). For example, a journalist's handle may indicate that they are at a particular news organization.
+    \item Providers wanting to offer free subdomains can do so at very little cost.
+\end{itemize}
+
 \subsection{Custom Feeds}\label{sec:feeds}
 
-\cite{AlgorithmicChoice}
+Several decentralized social networks choose to offer only a reverse-chronological feed of posts from accounts the user is following~-- a backlash against the opaque content recommendation algorithms employed by mainstream centralized social networks.
+For example, Mastodon advertises itself as having ``no algorithms to waste your time''~\cite{Mastodon}.
+
+Our belief is that the problem lies not with algorithms \emph{per se}, but rather with centrally controlled, opaque algorithms that remove user agency and prioritize user engagement (and hence, advertising revenue) over all else.
+Recommendation algorithms help users discover relevant content and find new accounts to follow~-- especially important for new users who are not yet following many accounts.
+They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics.
+
+Bluesky offers a selection of feed generation algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
+The goal is to offer an open and diverse ``marketplace of algorithms'' in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
+TODO: how many custom feeds have been created to date? link to section about how feed generators work.
+
+In Figure~\ref{fig:home-feed}, a selection of bookmarked feeds is given at the top of the screen; in this example, the selected ``Following'' feed is the default reverse-chronological timeline, while ``Week Peak Feed'' (network-wide posts with many likes from the last week) and ``Birds!'' (photos and posts from birdwatchers) are third-party feeds.
+A feed generator can use arbitrary criteria to select its content.
+For example, the birdwatching feed uses manual review of accounts in combination with a \#birds hashtag or a feather emoji character in posts to identify posts to include.
+Alternative approaches, such as machine learning algorithms, are equally possible.
 
 \section{The AT Protocol Architecture}\label{sec:architecture}
 
