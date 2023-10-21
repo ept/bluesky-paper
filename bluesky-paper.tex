@@ -2,7 +2,7 @@
 \setcopyright{none}
 
 \begin{document}
-\title{Bluesky and the AT Protocol:\\ A Foundation for Usable Decentralized Social Media}
+\title{Bluesky and the AT Protocol: Usable Decentralized Social Media}
 \author{Martin Kleppmann}
 \email{martin@kleppmann.com}
 \orcid{0000-0001-7252-6958}
@@ -23,6 +23,7 @@
 
 \begin{abstract}
 TODO
+% an architecture inspired by the web itself, but modernized to include streams of real-time updates and cryptographic authentication.
 \end{abstract}
 
 \begin{CCSXML}
@@ -87,7 +88,7 @@ One goal of this paper is therefore to bring Bluesky and the AT Protocol to the 
 \section{The Bluesky Social App}\label{sec:product}
 
 Bluesky presents itself to users as a straightforward microblogging application in the style of Twitter/X (see Figure~\ref{fig:home-feed}).
-The ``official'' client app is available on iOS, Android, and the web.
+The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky and deck.blue. % TODO: links to those apps
 Users can make public posts containing up to 300 characters of text, and up to four images, and they can interact with posts by replying, reposting, or liking.
 A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
 There are also alternative feeds that show content on various topics, without the user needing to follow the poster (see Section~\ref{sec:feeds}), which helps users discover each other.
@@ -156,16 +157,16 @@ Using DNS domain names as handles has several advantages:
     \item Providers wanting to offer free subdomains can do so at very little cost.
 \end{itemize}
 
-\subsection{Custom Feeds}\label{sec:feeds}
+\subsection{Custom Feeds and Algorithmic Choice}\label{sec:feeds}
 
 Several decentralized social networks choose to offer only a reverse-chronological feed of posts from accounts the user is following~-- a backlash against the opaque content recommendation algorithms employed by mainstream centralized social networks.
-For example, Mastodon advertises itself as having ``no algorithms to waste your time''~\cite{Mastodon}.
+For example, Mastodon advertises itself as having ``no algorithms or ads to waste your time''~\cite{Mastodon}.
 
-Our belief is that the problem lies not with algorithms \emph{per se}, but rather with centrally controlled, opaque algorithms that remove user agency and prioritize user engagement (and hence, advertising revenue) over all else.
-Recommendation algorithms help users discover relevant content and find new accounts to follow~-- especially important for new users who are not yet following many accounts.
-They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics.
+Our belief is that the problem lies not with algorithms \emph{per se}, but rather with centrally controlled, opaque algorithms that remove user agency and prioritize user engagement over all else, e.g.\ by promoting controversial posts.
+Good recommendation algorithms can help users discover content that is relevant to them and find new accounts to follow~-- especially important for new users who are not yet following many accounts.
+They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics, not all necessarily interesting to all followers.
 
-Bluesky offers a selection of feed generation algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
+Bluesky, PBC offers a selection of feed generation algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
 The goal is to offer an open and diverse ``marketplace of algorithms'' in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
 TODO: how many custom feeds have been created to date? link to section about how feed generators work.
 
