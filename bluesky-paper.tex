@@ -1,4 +1,7 @@
 \documentclass[sigconf,review]{acmart}
+\usepackage{tikz}
+\usepackage{tikzsymbols}
+
 \setcopyright{none}
 
 \begin{document}
@@ -175,6 +178,16 @@ A feed generator can use arbitrary criteria to select its content.
 For example, the birdwatching feed uses manual review of accounts in combination with a \#birds hashtag or a feather emoji character in posts to identify posts to include.
 Alternative approaches, such as machine learning algorithms, are equally possible.
 
+\begin{figure*}
+    \centering
+    \begin{tikzpicture}
+        \node (user) at (0,0) {\Strichmaxerl[5]};
+        \node (pds1) at (2,0) {PDS 1};
+    \end{tikzpicture}
+    \caption{The main services involved in providing Bluesky, and their relationships.}
+    \label{fig:indexing}
+\end{figure*}
+
 \section{The AT Protocol Architecture}\label{sec:architecture}
 
 Bluesky is the social app with the features explained in Section~\ref{sec:product}, while the AT Protocol is the underlying decentralized foundation.
@@ -231,6 +244,48 @@ Support for third-party PDS operators will be enabled at the latest when invitat
 
 \subsection{Indexing Infrastructure}\label{sec:indexing}
 
+On the web, websites are crawled and indexed by search engines, which then provide web-wide search and discovery features that the websites alone cannot provide.
+The AT Protocol is inspired by this architecture: the repositories hosted by PDSes are analogous to websites, and the indexing infrastructure is analogous to a search engine.
+User repositories are primary data (the ``source of truth''), and the indexes are derived from the content of the repositories.
+
+At the time of writing, most of Bluesky's indexing infrastructure is operated by Bluesky, PBC, but the company does not have any privileged access: since repositories are public, anybody can crawl and index them using the same protocols as our systems use.
+Client apps can switch to reading from a different index, or use a combination of multiple indexes.
+However, while operating a small PDS is designed to be cheap, operating an indexer that ingests the entire network requires greater computing resources.
+We therefore expect that there will be fewer hobbyist indexers, but as Bluesky grows, there are likely to be multiple professionally-run indexers for various purposes.
+For example, a company that performs sentiment analysis on social media activity about brands could easily create a whole-network index that provides insights to their clients.
+
+The indexing infrastructure operated by Bluesky, PBC is illustrated in Figure~\ref{fig:indexing}.
+It is composed of multiple services that have several integration points for external services.
+
+\subsubsection{Big Graph Service (BGS)}\label{sec:bgs}
+
+The first component is the \emph{Big Graph Service} (BGS), which crawls the user repositories on all known PDSes and consumes the streams of updates that they produce.
+BGS checks the signatures and Merkle tree proofs on updates, and maintains its own replica of each repository.
+From this information, BGS creates the \emph{firehose}: an aggregated stream of updates that notifies subscribers whenever records are added or deleted in any of the known repositories.
+
+The firehose is publicly available.
+Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the BGS performs some initial data cleaning such as discarding malformed updates and filtering out high-volume spam.
+The firehose can optionally include Merkle proofs and signatures along with records, allowing subscribers to check that they are authentic.
+
+BGS does not interpret or index the records in repositories, but simply stores and forwards them.
+Any developers wanting to create a new social app on top of atproto can define new record types, and these can be stored in existing repositories and aggregated in the firehose without requiring any changes to the BGS.
+
+\subsubsection{The App View}\label{sec:appview}
+
+The App View is a service that consumes the firehose, and processes the record types belonging to the Bluesky social app.
+For example, the App View counts the number of likes on every post, and it collects the set of replies to a particular post.
+The App View also maintains the set of followers for each user, and constructs the timeline containing the posts by the accounts that each user is following.
+Finally, it offers a web service through which this information can be queried.
+
+To display this information in the user's client app, the client queries the user's own PDS, which then fetches the neccessary data from the App View.
+The PDS personalizes the information from the App View to include details that are specific to the querying user, e.g.\ hiding posts from accounts that the user has muted, and indicating whether the user has already liked a given post.
+
+The App View is also responsible for enforcing moderation controls; for example, if one user has blocked another, the App View drops any attempts by the blocked users to interact with each other.
+If users are unhappy with the moderation rules applied by the App View operated by Bluesky, PBC, it is always possible for third parties to operate alternative App Views that index the same firehose and present the data in a different way.
+
+If the AT Protocol is used to implement another social application besides microblogging, that application will most likely require an App View service of its own, which can be hosted by anyone.
+This service can then interpret and index the records in users' repositories in whatever way is required for that application.
+
 \subsection{Labelers and Feed Generators}\label{sec:labeling}
 
 \subsection{User Identity}\label{sec:identity}
@@ -241,13 +296,15 @@ Support for third-party PDS operators will be enabled at the latest when invitat
 
 \subsection{TODO}
 
-How are images stored? When migrating an account to a new PDS, presumably images need to be moved along with the repo. Do viewers of an image fetch it from the PDS of the user who posted it, or from the AppView?
+How are images stored? When migrating an account to a new PDS, presumably images need to be moved along with the repo. Do viewers of an image fetch it from the PDS of the user who posted it, or from the App View?
 
 How does a PDS operator take down a ToS-violating post within a repo? Do they directly modify the repo and sign a new commit? How would this work if the signing key is not held custodially by the PDS, but rather by a client-side wallet?
 
 Do blocklists exist yet?
 
 Are keys held custodially by a PDS actually stored in a HSM? Is this why the same key is currently shared by all users on the same PDS? How will the key management change as a result of the PDS 2.0 architecture and the use of dedicated hardware in multiple locations?
+
+Do we want to talk about some kind of robots.txt-like mechanism through which users can specify preferences regarding crawling and indexing?
 
 \section{Related Work}\label{sec:related-work}
 
