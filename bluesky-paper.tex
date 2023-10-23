@@ -171,7 +171,8 @@ They are also helpful for surfacing content on a particular topic, whereas follo
 
 Bluesky, PBC offers a selection of feed generation algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
 The goal is to offer an open and diverse ``marketplace of algorithms'' in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
-TODO: how many custom feeds have been created to date? link to section about how feed generators work.
+Section~\ref{sec:labeling} explains how feed generators work.
+TODO: how many custom feeds have been created to date?
 
 In Figure~\ref{fig:home-feed}, a selection of bookmarked feeds is given at the top of the screen; in this example, the selected ``Following'' feed is the default reverse-chronological timeline, while ``Week Peak Feed'' (network-wide posts with many likes from the last week) and ``Birds!'' (photos and posts from birdwatchers) are third-party feeds.
 A feed generator can use arbitrary criteria to select its content.
@@ -288,6 +289,27 @@ This service can then interpret and index the records in users' repositories in 
 
 \subsection{Labelers and Feed Generators}\label{sec:labeling}
 
+The BGS and App View aim to provide a mostly ``unopinionated'' service: they compute indexes over the records in repositories in a neutral way, without attempting to rank or classify content.
+However, a good user experience also requires ``opinionated'' judgements for the purposes of content filtering (e.g.\ detecting sexually explicit images or spam) and curation (e.g.\ selecting posts on a particular topic).
+
+The AT Protocol architecture seperates out the ``opinionated'' aspects of the system into separate services: \emph{labelers} and \emph{feed generators}.
+These services typically take the firehose as their input.
+Labelers produce a stream of judgements about content (e.g.\ ``this post is spam''), whereas feed generators return a list of post IDs they have selected for inclusion in a custom feed, as described in Section~\ref{sec:feeds}.
+The output of labelers is consumed by App Views or PDSes in order to apply content filtering.
+For a feed generator, an App View expands the post IDs into full posts before sending them to the client app of users who have subscribed to that feed.
+
+Having labeler and feed generator services that are separate from App Views has several advantages:
+\begin{itemize}
+    \item Anyone can run such services, which enables a pluralistic ecosystem in which different parties may make different judgements about the same piece of content.
+        Users, as well as the operators of App Views and PDSes, can decide whose judgements they want to trust, and it is easy for them to switch to alternative labeling and feed generation services if their current providers do not meet their expectations.
+    \item It becomes easier to set up alternative App View providers: since any App View can consume the publicly available output from labelers and feed generators, there is no need for each App View to develop its own content filtering infrastructure.
+        Having alternative App Views besides the one operated by Bluesky, PBC, is important for a healthy, decentralized marketplace.
+\end{itemize}
+
+TODO: feed generator hosting services, and tools such as \url{https://github.com/skyfeed-dev/skyfeed-me}
+
+TODO: How is the output of labelers and feed generators consumed? Does it go to the user's PDS, or to the App View?
+
 \subsection{User Identity}\label{sec:identity}
 
 % Labeling services https://github.com/bluesky-social/proposals/tree/main/0002-labeling-and-moderation-controls
@@ -306,7 +328,11 @@ Are keys held custodially by a PDS actually stored in a HSM? Is this why the sam
 
 Do we want to talk about some kind of robots.txt-like mechanism through which users can specify preferences regarding crawling and indexing?
 
+Do we want to include some sort of discussion about business models? How do the operators of app views, labelers, etc.\ get paid?
+
 \section{Related Work}\label{sec:related-work}
+
+% Ecosystem review https://gitlab.com/bluesky-community1/decentralized-ecosystem/-/blob/master/README.md
 
 % https://activitypub.rocks/
 
@@ -319,8 +345,12 @@ Do we want to talk about some kind of robots.txt-like mechanism through which us
 % https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md
 % https://www.varunsrinivasan.com/2022/01/11/sufficient-decentralization-for-social-networks
 
+% Matrix, IRC, RSS
+
 % for likes, the record is around 100 bytes, and the the MST tree stuff is anywhere from 1-4kb (depending on the repo and other randomness in the MST), usually averaging around 2.5Kb.
 % https://github.com/bluesky-social/discuss/discussions/16#discussioncomment-7233086
+
+% Discussion: verifiable computaton? https://blueskyweb.xyz/blog/3-6-2022-a-self-authenticating-social-protocol
 
 \begin{acks}
 TODO
