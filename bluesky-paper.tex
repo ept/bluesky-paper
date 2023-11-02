@@ -435,9 +435,9 @@ TODO
 
 Ecosystem review \url{https://gitlab.com/bluesky-community1/decentralized-ecosystem/-/blob/master/README.md}
 
-\url{https://activitypub.rocks/}
+\url{https://fed.brid.gy/docs#compare}
 
-\url{https://scuttlebutt.nz/}
+\url{https://activitypub.rocks/}
 
 \url{https://github.com/lens-protocol/core}
 
@@ -451,6 +451,23 @@ Ecosystem review \url{https://gitlab.com/bluesky-community1/decentralized-ecosys
 \url{https://www.varunsrinivasan.com/2022/01/11/sufficient-decentralization-for-social-networks}
 
 Matrix, IRC, RSS
+
+\subsubsection{Scuttlebutt}
+
+Secure Scuttlebutt (SSB) is a peer-to-peer social networking protocol~\cite{Scuttlebutt}; Manyverse~\cite{Manyverse} and Planetary~\cite{Planetary} are social applications built upon the SSB protocol.
+It optionally uses relay servers called \emph{pubs} to store messages from peers that are offline, and to enable user discovery.
+The client software downloads the feeds from accounts that the user is explicitly following, and from accounts followed by followed accounts (up to three hops by default).
+This can require significant amounts of storage and bandwidth on the client.
+
+Any messages from users outside of the third-degree network are not shown, which effectively limits the set of people who can mention or reply to a user to the third-degree network.
+This deliberate design decision is intended to reduce moderation problems by prioritizing conversation between people who already know each other~\cite{ManyverseBluesky}.
+In contrast, Bluesky/atproto are designed to allow anybody to talk to anybody else.
+This requires more explicit moderation to manage unwanted content, but we believe it also enables serendipity and is a prerequisite for any ``digital town square''.
+
+Since SSB is built upon append-only logs and gossip replication, it is not possible to delete content once it has been posted~\cite{SSBDeletion}.
+User identity is tied to a cryptographic key on the user's device, requiring manual key management for moving to another device.
+Posting from multiple devices is not possible, as sharing the same key between devices can make an account unrecoverable~\cite{SSBMultiDevice}.
+A work-in-progress successor protocol to SSB, called PPPPP, is designed to address these issues~\cite{PPPPP}.
 
 % for likes, the record is around 100 bytes, and the the MST tree stuff is anywhere from 1-4kb (depending on the repo and other randomness in the MST), usually averaging around 2.5Kb.
 % https://github.com/bluesky-social/discuss/discussions/16#discussioncomment-7233086
