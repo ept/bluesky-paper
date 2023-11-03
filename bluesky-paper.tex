@@ -431,9 +431,19 @@ Discussion of verifiable computaton? \url{https://blueskyweb.xyz/blog/3-6-2022-a
 
 \section{Related Work}\label{sec:related-work}
 
-TODO
+Several other decentralized social networks are in development.
+We believe that there is no single optimal design: it is important to have several systems that make different trade-offs, and are therefore suitable for different purposes.
+Bluesky and the AT Protocol's choice of trade-offs aims to have lightweight clients while providing a global view over the whole network; for example, conversation threads include all replies (unless removed by moderation), regardless of the server on which they were posted.
+To achieve this goal we rely on an indexing infrastructure that is more centralized than some other designs (although we emphasize that there can be multiple competing indexers).
+Other systems make different trade-off choices, which are equally valid.
 
-Ecosystem review \url{https://gitlab.com/bluesky-community1/decentralized-ecosystem/-/blob/master/README.md}
+In 2021 some of our team published a decentralized social ecosystem review~\cite{EcosystemReview} in preparation for designing Bluesky/atproto.
+In this section we summarize some of the recent developments in other decentralized social networks that have happened since, and we refer to the review for a more comprehensive comparison of protocols and systems.
+
+Many decentralized social networking projects have ideas in common.
+For example, the idea of using DNS domain names as usernames also appears in Nostr~\cite{NostrDNS}.
+An atproto PDS has similarities to Git repository hosting (e.g.\ GitHub/Gitlab), Solid pods, or Mastodon servers.
+Public key authentication of user actions is widely used.
 
 \url{https://fed.brid.gy/docs#compare}
 
@@ -441,18 +451,15 @@ Ecosystem review \url{https://gitlab.com/bluesky-community1/decentralized-ecosys
 
 \url{https://github.com/lens-protocol/core}
 
-\url{https://nostr.com/}
-``the Nostr protocol powers Minds and Snort, among other decentralized social media''
-
 \url{https://www.farcaster.xyz/}
 
 \url{https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md}
 
 \url{https://www.varunsrinivasan.com/2022/01/11/sufficient-decentralization-for-social-networks}
 
-Matrix, IRC, RSS
+Matrix, IRC, XMPP, RSS
 
-\subsubsection{Scuttlebutt}
+\subsection{Scuttlebutt}
 
 Secure Scuttlebutt (SSB) is a peer-to-peer social networking protocol~\cite{Scuttlebutt}; Manyverse~\cite{Manyverse} and Planetary~\cite{Planetary} are social applications built upon the SSB protocol.
 It optionally uses relay servers called \emph{pubs} to store messages from peers that are offline, and to enable user discovery.
@@ -468,6 +475,18 @@ Since SSB is built upon append-only logs and gossip replication, it is not possi
 User identity is tied to a cryptographic key on the user's device, requiring manual key management for moving to another device.
 Posting from multiple devices is not possible, as sharing the same key between devices can make an account unrecoverable~\cite{SSBMultiDevice}.
 A work-in-progress successor protocol to SSB, called PPPPP, is designed to address these issues~\cite{PPPPP}.
+
+\subsection{Nostr}
+
+Nostr also began as a revision of SSB, replacing the append-only logs with individual signed messages~\cite{SSBNostr}.
+It leans more heavily on relay servers instead of peer-to-peer communication: clients publish and fetch messages on relays of their choice, and there is no federation among relays~\cite{Nostr}.
+The protocol is deliberately simple, and it prioritizes censorship resistance over moderation: relays can block users, but users can always move to a new relay.
+Communication (e.g.\ reply threads) is only possible between users who are connected to the same relay.
+Although some services index the whole Nostr network, these indexes are not used to facilitate user-to-user interaction.
+As a result, it is unpredictable who will see which message.
+The creator of Nostr writes: ``there are no guarantees of anything [\dots] to use Nostr one must embrace the inherent chaos~\cite{NostrVision}''. 
+Key management is manual in Nostr.
+
 
 % for likes, the record is around 100 bytes, and the the MST tree stuff is anywhere from 1-4kb (depending on the repo and other randomness in the MST), usually averaging around 2.5Kb.
 % https://github.com/bluesky-social/discuss/discussions/16#discussioncomment-7233086
