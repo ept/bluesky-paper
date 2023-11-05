@@ -485,7 +485,24 @@ Communication (e.g.\ reply threads) is only possible between users who are conne
 Although some services index the whole Nostr network, these indexes are not used to facilitate user-to-user interaction.
 As a result, it is unpredictable who will see which message.
 The creator of Nostr writes: ``there are no guarantees of anything [\dots] to use Nostr one must embrace the inherent chaos~\cite{NostrVision}''. 
-Key management is manual in Nostr.
+Key management is manual in Nostr, and facilities for key rotation are still under discussion~\cite{NostrKeyRotation}.
+
+% Are like counts and follower counts approximate? NIP-45 defines server-side aggregation
+% https://github.com/nostr-protocol/nips/issues/159
+% https://github.com/nostr-protocol/nips/blob/master/45.md
+
+\subsection{Farcaster}
+
+Farcaster~\cite{Farcaster} has some architectural similarities to Bluesky/atproto, although it was developed independently.
+It has storage servers called \emph{hubs}, which store the state of the entire network similarly to an atproto BGS, and it has a concept of \emph{hosted app servers} that are similar to our app view~\cite{FarcasterOverview}.
+Farcaster user IDs are similar to our DIDs, and they are mapped to public keys using a smart contract on the Ethereum Optimism blockchain that is functionally similar to our PLC directory.
+Usernames can be either ENS names~\cite{ENS}, or names within an off-chain namespace managed centrally by Farcaster, similarly to \texttt{.bsky.social} subdomains in Bluesky~\cite{FarcasterArchitecture}.
+
+A difference is that Farcaster has no equivalent to atproto's PDS; instead, client apps publish signed messages directly to a hub, and hubs synchronize messages using a convergent gossip protocol.
+Users must pay in cryptocurrency to register their public key, and for hub data storage (at the time of writing, Ethereum equivalent to \$5~USD/year); when a user exceeds their storage allowance, old messages are deleted.
+Fees are currently collected centrally by the Farcaster team~\cite{FarcasterFees}.
+In contrast, the AT Protocol does not specify storage limitations, but leaves it to providers of PDS and indexing services to define their own business model and abuse-prevention policies.
+We also prefer to avoid a dependency on a blockchain or cryptocurrency.
 
 
 % for likes, the record is around 100 bytes, and the the MST tree stuff is anywhere from 1-4kb (depending on the repo and other randomness in the MST), usually averaging around 2.5Kb.
