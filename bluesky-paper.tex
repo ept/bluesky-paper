@@ -58,7 +58,7 @@
 \keywords{social media, decentralization, federation, web architecture, community moderation}
 \maketitle
 
-\section{Introduction}
+\section{Introduction}\label{sec:introduction}
 
 Over the last two decades, social media services have evolved from a fun curiosity into a cornerstone of civic life~\cite{Barabas:2017}.
 This development has been accompanied by increasing unease that mainstream ``digital town squares'', such as Twitter/X or Facebook, are under the control of a single corporation, and may change their policies on the whim of their leaders~\cite{Yeung:2023}.
@@ -425,32 +425,19 @@ The AT Protocol does not make any assumptions about how PDSes authenticate their
 \section{Related Work}\label{sec:related-work}
 
 Several other decentralized social networks are in development.
-We believe that there is no single optimal design: it is important to have several systems that make different trade-offs, and are therefore suitable for different purposes.
-Bluesky and the AT Protocol's choice of trade-offs aims to have lightweight clients while providing a global view over the whole network; for example, conversation threads include all replies (unless removed by moderation), regardless of the server on which they were posted.
-To achieve this goal we rely on an indexing infrastructure that is more centralized than some other designs (although we emphasize that there can be multiple competing indexers).
-Other systems make different trade-off choices, which are equally valid.
+We believe that there is no single optimal design: different systems make different trade-offs, and are therefore suitable for different purposes.
+Bluesky and the AT Protocol aim to provide a good user experience by making moderation a first-class concern, by having clients that are lightweight and fast, and by providing a global view over the whole network.
+For example, conversation threads include all replies (unless removed by moderation), regardless of the server on which they were posted.
+To achieve this goal we rely on an indexing infrastructure that is more centralized than some other designs.
+However, we emphasize that there can be multiple competing indexers, and third-party client apps are free to show data from whichever indexers they wish.
 
 In 2021 some of our team published a decentralized social ecosystem review~\cite{EcosystemReview} in preparation for designing Bluesky/atproto.
 In this section we summarize some of the recent developments in other decentralized social networks that have happened since, and we refer to the review for a more comprehensive comparison of protocols and systems.
 
 Many decentralized social networking projects have ideas in common.
 For example, the idea of using DNS domain names as usernames also appears in Nostr~\cite{NostrDNS}.
-An atproto PDS has similarities to Git repository hosting (e.g.\ GitHub/Gitlab), Solid pods, or Mastodon servers.
-Public key authentication of user actions is widely used.
-
-\url{https://fed.brid.gy/docs#compare}
-
-\url{https://activitypub.rocks/}
-
-\url{https://github.com/lens-protocol/core}
-
-\url{https://www.farcaster.xyz/}
-
-\url{https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md}
-
-\url{https://www.varunsrinivasan.com/2022/01/11/sufficient-decentralization-for-social-networks}
-
-Matrix, IRC, XMPP, RSS
+An atproto PDS has similarities to Git repository hosting (e.g.\ GitHub/Gitlab), Solid pods~\cite{Solid}, or Mastodon servers.
+There are also federated chat systems such as Matrix~\cite{Matrix}, IRC~\cite{IRC}, and XMPP~\cite{XMPP}, but we focus on systems that provide a Twitter-like model where users follow each other.
 
 \subsection{Scuttlebutt}
 
@@ -473,21 +460,21 @@ A work-in-progress successor protocol to SSB, called PPPPP, is designed to addre
 
 Nostr also began as a revision of SSB, replacing the append-only logs with individual signed messages~\cite{SSBNostr}.
 It leans more heavily on relay servers instead of peer-to-peer communication: clients publish and fetch messages on relays of their choice, and there is no federation among relays~\cite{Nostr}.
-The protocol is deliberately simple, and it prioritizes censorship resistance over moderation: relays can block users, but users can always move to a new relay.
+The protocol is deliberately simple, and it prioritizes censorship resistance over moderation: relays can block users, but users can always move to a new relay, and use multiple relays at the same time.
 Communication (e.g.\ reply threads) is only possible between users who are connected to the same relay.
 Although some services index the whole Nostr network, these indexes are not used to facilitate user-to-user interaction.
 As a result, it is unpredictable who will see which message.
-The creator of Nostr writes: ``there are no guarantees of anything [\dots] to use Nostr one must embrace the inherent chaos~\cite{NostrVision}''. 
+The creator of Nostr writes: ``there are no guarantees of anything [\dots] to use Nostr one must embrace the inherent chaos''~\cite{NostrVision}. 
 Key management is manual in Nostr, and facilities for key rotation are still under discussion~\cite{NostrKeyRotation}.
 
 % Are like counts and follower counts approximate? NIP-45 defines server-side aggregation
 % https://github.com/nostr-protocol/nips/issues/159
 % https://github.com/nostr-protocol/nips/blob/master/45.md
 
-\subsection{Farcaster}
+\subsection{Farcaster and blockchain-based systems}
 
 Farcaster~\cite{Farcaster} has some architectural similarities to Bluesky/atproto, although it was developed independently.
-It has storage servers called \emph{hubs}, which store the state of the entire network similarly to an atproto BGS, and it has a concept of \emph{hosted app servers} that are similar to our app view~\cite{FarcasterOverview}.
+It has storage servers called \emph{hubs}, which store the state of the entire network similarly to an atproto BGS, and it has a concept of \emph{hosted app servers} that are similar to our App View~\cite{FarcasterOverview}.
 Farcaster user IDs are similar to our DIDs, and they are mapped to public keys using a smart contract on the Ethereum Optimism blockchain that is functionally similar to our PLC directory.
 Usernames can be either ENS names~\cite{ENS}, or names within an off-chain namespace managed centrally by Farcaster, similarly to \texttt{.bsky.social} subdomains in Bluesky~\cite{FarcasterArchitecture}.
 
@@ -495,11 +482,54 @@ A difference is that Farcaster has no equivalent to atproto's PDS; instead, clie
 Users must pay in cryptocurrency to register their public key, and for hub data storage (at the time of writing, Ethereum equivalent to \$5~USD/year); when a user exceeds their storage allowance, old messages are deleted.
 Fees are currently collected centrally by the Farcaster team~\cite{FarcasterFees}.
 In contrast, the AT Protocol does not specify storage limitations, but leaves it to providers of PDS and indexing services to define their own business model and abuse-prevention policies.
-We also prefer to avoid a dependency on a blockchain or cryptocurrency.
+We also prefer to avoid a dependency on a cryptocurrency.
+
+The Lens protocol~\cite{Lens} is more strongly blockchain-based than Farcaster: it even stores high-volume user actions such as posts and follows on Polygon, a proof-of-stake blockchain.
+DSNP takes a similar approach~\cite{DSNP}.
+Placing high-volume events directly on a blockchain incurs orders of magnitude higher per-user costs than atproto, and is likely to run into scalability limits as the number of users grows.
+Lens is adopting a layer-3 blockchain that provides better scalability and lower cost~\cite{LensMomoka}, but weaker security properties.
+Linking social accounts to cryptocurrency wallets and NFTs enables users to monetize their content, but this is not a goal of atproto.
+
+\subsection{ActivityPub and Mastodon}
+
+ActivityPub~\cite{ActivityPub} is a W3C standard for social networking, and Mastodon~\cite{Mastodon} is its most popular implementation.
+We have highlighted aspects of their design in Sections~\ref{sec:introduction}, \ref{sec:feeds}, and \ref{sec:pds}.
+Overall, Mastodon gives a lot of power to server administrators: for example, a server admin can choose to block another server, preventing all communication between users on those servers, even those who are not part of the disagreement that led to the blocking.
+There is a degree of lock-in to a server because moving to another server is an intrusive operation: the username changes, moving posts to the new server currently requires an experimental command-line tool~\cite{MastodonPostMigration,MastodonContentMover}, and other users' replies to those post are lost.
+These risks can be avoided by self-hosting; managed providers exist~\cite{MastodonHosting}, but they still require some expertise and cost money.
+The AT Protocol separates the roles of moderation and hosting, and aims to make it easier to change providers.
+
+When user $A$ follows user $B$, $A$'s server asks $B$'s server to send it notifications of $B$'s future posts via ActivityPub.
+This architecture has the advantage of not requiring a whole-network index.
+However, replies to a post notify the server of the original poster, but not necessarily every server that has a copy of the original post, leading to inconsistent reply threads on different servers.
+Ensuring consistent reply threads would require each server to have a copy of the whole network, which would make it expensive to run a server.
+Viral posts can generate a lot of inbound requests to a server from people liking, replying, and boosting (reposting).
+The Bluesky indexing infrastructure is also fairly expensive, but since users can choose their moderation preferences independently from the indexing provider, we believe that the system can be healthy with a small number of indexing providers.
+
+Security in ActivityPub is based on servers' TLS certificates; there is no per-user cryptographic authentication of content.
+
+% Centralising tendency: for new users who don't have a dedicated server for their specific community, the default choice is to join one of the big servers.
 
 
-% for likes, the record is around 100 bytes, and the the MST tree stuff is anywhere from 1-4kb (depending on the repo and other randomness in the MST), usually averaging around 2.5Kb.
-% https://github.com/bluesky-social/discuss/discussions/16#discussioncomment-7233086
+\section{Conclusions}
+
+Bluesky and the AT Protocol are a new approach to social media.
+While some decentralized systems prioritize censorship resistance, we believe that a good user experience requires explicitly addressing problematic content such as harassment and misinformation.
+We therefore make moderation a first-class concern that is handled separately from infrastructure hosting, and we provide strong mechanisms for users to control the content they see.
+
+Our open architecture allows a pluralistic system in which there is no global consensus on what content is acceptable.
+A user on a self-hosted or loosely moderated PDS may post controversial content, but they are not entitled to the attention of others: App Views may choose not to index it, and clients may ignore it depending on the user's moderation settings.
+This philosophy is sometimes described as ``free speech, but not free reach''~\cite{DiResta:2018}.
+
+% 3rd-party clients allow bsky pbc to offer a more curated, opinionated service with stronger moderation, protecting bsky brand
+% e.g. bsky own labelers mandatory
+% clients may bundle moderation defaults, e.g. enforcing usage of a particular labeler
+% can't ban 3rd-party clients like reddit apollo
+% prior art: content that is illegal e.g. in germany: twitter filters it out client-side
+
+% Do we want to talk about some kind of robots.txt-like mechanism through which users can specify preferences regarding crawling and indexing?
+
+% Do we want to include some sort of discussion about business models? How do the operators of app views, labelers, etc. get paid?
 
 \begin{acks}
 TODO
