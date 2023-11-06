@@ -91,14 +91,6 @@ For example, researchers wanting to identify disinformation campaigns can easily
 If they are able construct an algorithm to label suspected disinformation, they can publish their labels in real time, and users who wish to see those labels can enable them in their client software.
 One goal of this paper is to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
 
-\section{The Bluesky Social App}\label{sec:product}
-
-Bluesky presents itself to users as a straightforward microblogging application in the style of Twitter/X (see Figure~\ref{fig:home-feed}).
-The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky~\cite{Graysky} and deck.blue~\cite{deck.blue}.
-Users can make public posts containing up to 300 characters of text, and up to four images, and they can interact with posts by replying, reposting, or liking.
-A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
-There are also alternative feeds that show content on various topics, without the user needing to follow the poster (see Section~\ref{sec:feeds}), which helps users discover each other.
-
 \begin{figure}
     \centering
     \includegraphics[width=0.7\linewidth]{home-feed.png}
@@ -106,6 +98,14 @@ There are also alternative feeds that show content on various topics, without th
     \caption{Screenshot of the Bluesky home screen.}
     \label{fig:home-feed}
 \end{figure}
+
+\section{The Bluesky Social App}\label{sec:product}
+
+Bluesky presents itself to users as a straightforward microblogging application in the style of Twitter/X (see Figure~\ref{fig:home-feed}).
+The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky~\cite{Graysky} and deck.blue~\cite{deck.blue}.
+Users can make public posts containing up to 300 characters of text, and up to four images, and they can interact with posts by replying, reposting, or liking.
+A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
+There are also alternative feeds that show content on various topics, without the user needing to follow the poster (see Section~\ref{sec:feeds}), which helps users discover each other.
 
 \begin{figure}
     \centering
@@ -186,6 +186,24 @@ A feed generator can use arbitrary criteria to select its content.
 For example, the birdwatching feed uses a manually curated list of accounts, and selects posts from those accounts that contain a \#birds hashtag or a feather emoji character.
 Alternative approaches, such as machine learning algorithms, are equally possible.
 
+\section{The AT Protocol Architecture}\label{sec:architecture}
+
+Bluesky is the social app with the features explained in Section~\ref{sec:product}, while the AT Protocol is the underlying decentralized foundation.
+We maintain this separation because the AT Protocol is designed to support multiple \emph{social modes}, not just Bluesky.
+For example, besides a Twitter-style microblogging app, atproto could also be used to implement Reddit-style forums, long-form blogs with comments, or domain-specific social applications such as link sharing or book reviews.
+The same user identity, social graph, and user data storage servers can be shared between all of these apps.
+
+The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
+At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
+Anyone can define a new lexicon, allowing new social modes to coexist alongside the Bluesky social app on a shared infrastructure.
+The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate the process of specifying and versioning an interoperable protocol.
+
+The biggest constraint for new social modes is that atproto is currently designed for content that users want to make publicly available.
+In particular, Bluesky user profiles, posts, follows, and likes are all public.
+Blocking actions are also currently public; however, we are investigating mechanisms for making these private~\cite{PublicBlocks,PrivateBlocks}.
+At present, Bluesky does not support private communications, such as direct messages, though we plan to add this in the future.
+Only a small amount of user state is currently private: any muted accounts and threads, notifications and their read/unread status, and user preferences such as pinned feeds and content filtering settings.
+
 \begin{figure*}
     \centering
     \includegraphics[width=\linewidth]{architecture.pdf}
@@ -207,24 +225,6 @@ Alternative approaches, such as machine learning algorithms, are equally possibl
 % https://www.flaticon.com/free-icon/blogger_3893160
 % https://www.flaticon.com/free-icon/online-learning_12641520
 % https://www.flaticon.com/free-icon/working_5654681
-
-\section{The AT Protocol Architecture}\label{sec:architecture}
-
-Bluesky is the social app with the features explained in Section~\ref{sec:product}, while the AT Protocol is the underlying decentralized foundation.
-We maintain this separation because the AT Protocol is designed to support multiple \emph{social modes}, not just Bluesky.
-For example, besides a Twitter-style microblogging app, atproto could also be used to implement Reddit-style forums, long-form blogs with comments, or domain-specific social applications such as link sharing or book reviews.
-The same user identity, social graph, and user data storage servers can be shared between all of these apps.
-
-The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
-At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
-Anyone can define a new lexicon, allowing new social modes to coexist alongside the Bluesky social app on a shared infrastructure.
-The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate the process of specifying and versioning an interoperable protocol.
-
-The biggest constraint for new social modes is that atproto is currently designed for content that users want to make publicly available.
-In particular, Bluesky user profiles, posts, follows, and likes are all public.
-Blocking actions are also currently public; however, we are investigating mechanisms for making these private~\cite{PublicBlocks,PrivateBlocks}.
-At present, Bluesky does not support private communications, such as direct messages, though we plan to add this in the future.
-Only a small amount of user state is currently private: any muted accounts and threads, notifications and their read/unread status, and user preferences such as pinned feeds and content filtering settings.
 
 \subsection{User Data Repositories}\label{sec:repos}
 
@@ -306,6 +306,19 @@ The firehose can optionally include Merkle proofs and signatures along with reco
 BGS does not interpret or index the records in repositories, but simply stores and forwards them.
 Any developers wanting to create a new social mode on top of atproto can define a new lexicon with new record types, and these records can be stored in existing repositories and aggregated in the firehose without requiring any changes to the BGS.
 
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{identity.pdf}
+    \Description{Handle (e.g. nytimes.com) resolves to DID via DNS TXT record or HTTPS request. DID resolves to DID document via did:web or did:plc directory server.}
+    \caption{A handle resolves to a DID, and a DID resolves to a DID document, which in turn references the handle, DID, and the user's public key. Icons from Flaticon.com.}
+    \label{fig:identity}
+\end{figure*}
+
+% Icons used:
+% https://www.flaticon.com/free-icon/dns_2333476
+% https://www.flaticon.com/free-icon/fingerprint-scan_6692271
+% https://www.flaticon.com/free-icon/folder_4883508
+
 \subsubsection{The App View}\label{sec:appview}
 
 The App View is a service that consumes the firehose, and processes the records that are relevant to the Bluesky social app (records in the \texttt{com.atproto} and \texttt{app.bsky} lexicons).
@@ -325,19 +338,6 @@ This service can then interpret and index the records in users' repositories in 
 % Push notifications need to go through a service run by the developer of the client app.
 % For the official Bluesky app, the app view handles push notifications.
 % For 3rd-party clients we have an open interface for any client to register a user with their own push notification service, but at the moment they must generate the notifications themselves, e.g. by following the firehose. 
-
-\begin{figure*}
-    \centering
-    \includegraphics[width=\linewidth]{identity.pdf}
-    \Description{Handle (e.g. nytimes.com) resolves to DID via DNS TXT record or HTTPS request. DID resolves to DID document via did:web or did:plc directory server.}
-    \caption{A handle resolves to a DID, and a DID resolves to a DID document, which in turn references the handle, DID, and the user's public key. Icons from Flaticon.com.}
-    \label{fig:identity}
-\end{figure*}
-
-% Icons used:
-% https://www.flaticon.com/free-icon/dns_2333476
-% https://www.flaticon.com/free-icon/fingerprint-scan_6692271
-% https://www.flaticon.com/free-icon/folder_4883508
 
 \subsection{Labelers and Feed Generators}\label{sec:labeling}
 
