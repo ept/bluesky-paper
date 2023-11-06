@@ -16,12 +16,12 @@
 \author{Jake Gold} % jake@blueskyweb.xyz
 \author{Jay Graber} % jay@blueskyweb.xyz
 \author{Daniel Holmgren} % daniel@blueskyweb.xyz
-\affiliation{\institution{Bluesky, PBC}\country{United States}}
+\affiliation{\institution{Bluesky Social PBC}\country{United States}}
 \author{Devin Ivy} % devin@blueskyweb.xyz
 \author{Jeromy Johnson} % why@blueskyweb.xyz
 \author{Bryan Newbold} % bryan@blueskyweb.xyz
 \author{Jaz Volpert} % jaz@blueskyweb.xyz
-\affiliation{\institution{Bluesky, PBC}\country{United States}}
+\affiliation{\institution{Bluesky Social PBC}\country{United States}}
 
 \begin{abstract}
     Bluesky is a new social network built upon the AT Protocol, a decentralized foundation for public social media.
@@ -55,7 +55,7 @@
 \ccsdesc[500]{Networks~Social media networks}
 \ccsdesc[300]{Social and professional topics~Centralization / decentralization}
 
-\keywords{social media, decentralization, federation, web architecture}
+\keywords{social media, decentralization, federation, web architecture, community moderation}
 \maketitle
 
 \section{Introduction}
@@ -83,17 +83,18 @@ The AT Protocol is designed such that for every part of the system there are mul
 
 Decentralization alone is not able to solve some of the thorniest problems of social media, such as misinformation, harassment, and hate speech.
 However, by opening up the internals of a service to contributors who are not employees of a particular company, decentralization can enable a marketplace of approaches to these problems.
-For example, Bluesky allows anybody to create custom feeds that can apply arbitrary filtering and content selection methods, and custom client software can access all features of the ``official'' app, including moderation tools.
-Our hope is that this architectural openness will enable communities to develop their own approaches to managing problematic content, without depending on a centralized service operator to implement these features for them.
+For example, Bluesky allows anybody to run moderation services that make subjective decisions of selecting desirable content or flagging undesirable content, and users can choose which moderation services they want to subscribe to.
+Moderation services are decoupled from hosting providers, making it easy for users to switch moderation services until they find ones that match their preferences.
+Our hope is that this architectural openness enables communities to develop their own approaches to managing problematic content, independently of what any particular service operator implements.
 
 For example, researchers wanting to identify disinformation campaigns can easily get access to all content being posted, the social graph, and user profiles on Bluesky.
-If they are able construct an algorithm to label suspected disinformation, they can publish their labels in real time for use by other parts of the system, such as custom feed generators or client apps.
-One goal of this paper is therefore to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
+If they are able construct an algorithm to label suspected disinformation, they can publish their labels in real time, and users who wish to see those labels can enable them in their client software.
+One goal of this paper is to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
 
 \section{The Bluesky Social App}\label{sec:product}
 
 Bluesky presents itself to users as a straightforward microblogging application in the style of Twitter/X (see Figure~\ref{fig:home-feed}).
-The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky and deck.blue. % TODO: links to those apps
+The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky~\cite{Graysky} and deck.blue~\cite{deck.blue}.
 Users can make public posts containing up to 300 characters of text, and up to four images, and they can interact with posts by replying, reposting, or liking.
 A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
 There are also alternative feeds that show content on various topics, without the user needing to follow the poster (see Section~\ref{sec:feeds}), which helps users discover each other.
@@ -119,26 +120,29 @@ At the time of writing, an invitation code is required to create an account, and
 Such control over user signups may seem contradictory for a supposedly open and decentralized network, but it has been necessary to limit the load on our infrastructure and to keep abuse at a manageable level.
 We intend to remove the need for invite codes in early 2024.
 
-Bluesky, PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source under the MIT license~\cite{BlueskyGithub}.
+Bluesky Social PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source under the MIT license~\cite{BlueskyGithub}.
 The protocols they use are defined by open specifications~\cite{AtProtoSpecs}.
 Several parts of the system, such as feed generators (Section~\ref{sec:feeds}) and various alternative clients~\cite{AtProtoClients} are developed and operated by independent third parties.
 
 \subsection{Moderation Features}\label{sec:moderation}
 
-Bluesky has several moderation mechanisms for managing unwanted content:
+Bluesky currently has the following moderation mechanisms (additional mechanisms are under discussion~\cite{Moderation}):
 \begin{description}
     \item[Content filtering:] Automated systems label potentially problematic content (such as images of a sexual or violent nature, posts promoting hate groups, or spam), and the app's preferences allow users to choose whether to show or hide content in each of these categories in their feeds.
     \item[Mute:] A user can mute specific accounts or threads, which hides the muted content from their own feeds and notifications. The content continues to be visible to other users, and the target does not know that they were muted. A user can also publish a mutelist of accounts, and other users can subscribe to that list, which has the same effect as if they individually muted all of the accounts on the list.
-    \item[Block:] One user can block another, which prevents all future interactions (such as mentions, replies, or reposts) between those accounts in addition to muting.
-    \item[Takedown:] Users can report content that violates the terms of service to server operators, and the operators can take down violating posts or accounts.
+    \item[Block:] One user can block another, which prevents all future interactions (such as mentions, replies, or reposts) between those accounts in addition to muting. Similarly to mutelists, a user can also publish a list of accounts, and other users can block all accounts on that list by subscribing to it.
+    \item[Interaction gating:] A user who makes a post can restrict who is allowed to reply to it (anyone, anyone they follow, anyone mentioned in the post, and/or anyone on a particular list of accounts).
+    \item[Takedown:] Users can report content that violates the terms of service to server operators, and the operators can take down violating media, posts, or accounts.
     \item[Custom feeds:] While the aforementioned mechanisms provide negative moderation (helping users avoid content they do not want to see), feed generators (see Section~\ref{sec:feeds}) can actively select high-quality content.
 \end{description}
 
-Additional moderation mechanisms are under discussion~\cite{Moderation}.
+% full account takedown at PDS: easy, entire repo unavailable
+% take down a post at PDS: one record is unavailable -- is not announced in event stream, not removed from MST, not filtered from full repo download. per-post takedown at app view makes more sense
+% take down a blob at PDS: reference stays there, but refuse to serve the blob (quarantine it, move out of user's storage)
 
 \subsection{User Handles}\label{sec:handles}
 
-Like on Twitter, a Bluesky user has two names: the \emph{display name} can be almost any string, and the \emph{handle} needs to uniquely identify a user.
+Like on Twitter/X, a Bluesky user has two names: the \emph{display name} can be almost any string, and the \emph{handle} needs to uniquely identify a user.
 A handle, prefixed with an @ sign, is used to mention another user in a post.
 Examples can be seen in Figure~\ref{fig:home-feed} (the display name is in bold, and the handle is in a smaller font and lighter color).
 
@@ -147,7 +151,7 @@ Mastodon's approach is to include the server name in the handle, which makes it 
 An alternative would be to use a blockchain-based naming system, such as the Ethereum Name System (ENS)~\cite{ENS}; this has the disadvantage of requiring the user to buy cryptocurrency in order to create an account, which we wanted to avoid.
 
 Instead, Bluesky and atproto use DNS domain names as handles.
-If a user already owns a domain name, they can claim it as their Bluesky handle by adding a DNS record or by hosting a file under a \texttt{.well-known} HTTPS URL on that domain~\cite{DomainHandle}.
+If a user already owns a domain name, they can claim it as their Bluesky handle by adding a DNS record or by hosting a file under a \texttt{/.well-known/} HTTPS URL on that domain~\cite{DomainHandle}.
 Users can also buy a new domain name within Bluesky, via a partnership with a domain registrar~\cite{PurchaseDomain}.
 Alternatively, users can sign up for a subdomain of \texttt{.bsky.social} for free.
 
@@ -170,21 +174,22 @@ For example, Mastodon advertises itself as having ``no algorithms or ads to wast
 Our belief is that the problem lies not with algorithms \emph{per se}, but rather with centrally controlled, opaque algorithms that remove user agency and prioritize user engagement over all else, e.g.\ by promoting controversial posts.
 Good recommendation algorithms can help users discover content that is relevant to them and find new accounts to follow~-- especially important for new users who are not yet following many accounts.
 They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics, not all necessarily interesting to all followers.
+Giving users the ability to choose their algorithms lets them control what they want to see, rather than having the platform decide for them.
 
-Bluesky, PBC offers a selection of feed generation algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
-The goal is to offer an open and diverse ``marketplace of algorithms'' in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
+Bluesky Social PBC offers a selection of feed algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
+Tens of thousands of custom feeds have already been created.
+Our goal is to offer an open and diverse marketplace of algorithms in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
 Section~\ref{sec:labeling} explains how feed generators work.
-TODO: how many custom feeds have been created to date?
 
 In Figure~\ref{fig:home-feed}, a selection of bookmarked feeds is given at the top of the screen; in this example, the selected ``Following'' feed is the default reverse-chronological timeline, while ``Week Peak Feed'' (network-wide posts with many likes from the last week) and ``Birds!'' (photos and posts from birdwatchers) are third-party feeds.
 A feed generator can use arbitrary criteria to select its content.
-For example, the birdwatching feed uses manual review of accounts in combination with a \#birds hashtag or a feather emoji character in posts to identify posts to include.
+For example, the birdwatching feed uses a manually curated list of accounts, and selects posts from those accounts that contain a \#birds hashtag or a feather emoji character.
 Alternative approaches, such as machine learning algorithms, are equally possible.
 
 \begin{figure*}
     \centering
     \includegraphics[width=\linewidth]{architecture.pdf}
-    \Description{Client apps send posts, likes, etc. to the user's home PDS. A stream of records from each PDS is consumed by the BGS, and aggregated to form the firehose. The firehose is consumed by the Bluesky App View as well as labelers and feed generators. PDSes read from the App View to obtain threads of replies, like counts, etc. Bluesky, PBC currently hosts several PDSes, the BGS, the App View, and some of the labelers and feed generators. The Bluesky App View also pulls data from external labelers and feed generators. Other providers can set up alternative PDSes, aggregators, and app views if they wish (including app views for social modes other than microblogging).}
+    \Description{Client apps send posts, likes, etc. to the user's home PDS. A stream of records from each PDS is consumed by the BGS, and aggregated to form the firehose. The firehose is consumed by the Bluesky App View as well as labelers and feed generators. PDSes read from the App View to obtain threads of replies, like counts, etc. Bluesky Social PBC currently hosts several PDSes, the BGS, the App View, and some of the labelers and feed generators. The Bluesky App View also pulls data from external labelers and feed generators. Other providers can set up alternative PDSes, aggregators, and app views if they wish (including app views for social modes other than microblogging).}
     \caption{The main services involved in providing Bluesky, and data flows between them. Icons from Flaticon.com.}
     \label{fig:indexing}
 \end{figure*}
@@ -213,18 +218,22 @@ The same user identity, social graph, and user data storage servers can be share
 The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
 At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
 Anyone can define a new lexicon, allowing new social modes to coexist alongside the Bluesky social app on a shared infrastructure.
+The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate the process of specifying and versioning an interoperable protocol.
 
-The biggest constraint for new social modes is that atproto is designed for content that users intend to make publicly available.
+The biggest constraint for new social modes is that atproto is currently designed for content that users want to make publicly available.
 In particular, Bluesky user profiles, posts, follows, and likes are all public.
-Blocking actions are also currently public; however, we are investigating mechanisms for making these private~\cite{PrivateBlocks}.
-At present, Bluesky does not support direct messages, which would need to be private and encrypted.
-Only a small amount of Bluesky user state is currently private: any muted accounts and threads, notifications, and their read/unread status.
+Blocking actions are also currently public; however, we are investigating mechanisms for making these private~\cite{PublicBlocks,PrivateBlocks}.
+At present, Bluesky does not support private communications, such as direct messages, though we plan to add this in the future.
+Only a small amount of user state is currently private: any muted accounts and threads, notifications and their read/unread status, and user preferences such as pinned feeds and content filtering settings.
 
 \subsection{User Data Repositories}\label{sec:repos}
 
 All data that a user wishes to publish is added to their \emph{repository}, which stores a collection of \emph{records}.
 Whenever a user performs some action~-- making a post, liking another user's post, following another user, etc.~-- that action becomes a record in their repository.
-The structure of records is defined by the lexicon, and a repository may contain a mixture of records from several different lexicons, representing user actions in different social modes.
+Records are encoded in DAG-CBOR~\cite{DAG-CBOR}, a restricted form of CBOR~\cite{CBOR}, a compact binary data format.
+The schema of records is defined by the lexicon, and a repository may contain a mixture of records from several different lexicons, representing user actions in different social modes.
+Media files (e.g.\ images) are stored outside of the user's repository, but referenced by their CID~\cite{CID} (essentially a hash) from a record in the repository.
+Similarly, a reference to a record in another repository (e.g.\ identifying a post being liked) also includes its CID.
 
 Each user account has one repository, and it contains all of the actions they have ever performed, minus any records they have explicitly deleted.
 A \emph{Personal Data Server (PDS)} hosts the user's repository and makes it publicly available as a web service; we discuss PDSes in more detail in Section~\ref{sec:pds}.
@@ -237,29 +246,30 @@ The \emph{AT} in atproto stands for \emph{Authenticated Transfer}, which reflect
 The records in a repository are organized into a \emph{Merkle Search Tree} (MST), a type of Merkle tree that remains balanced, even as records are inserted or deleted in arbitrary order~\cite{Auvolat:2019}.
 After every change to a repository, the root hash of the MST is signed; the public verification key for this signature is part of the user identity described in Section~\ref{sec:identity}.
 This enables an efficient cryptographic proof that a given record appears within a given user's repository.
+Moreover, when a user updates or deletes a record, the MST enables a proof that the old record no longer appears in the repository.
 
 \subsection{Personal Data Servers (PDS)}\label{sec:pds}
 
-A PDS allows anybody to query the content of the repositories that it hosts via a HTTP API.
-Moreover, a PDS provides a real-time stream of updates for the repositories it hosts.
+A PDS stores repositories and associated media files, and allows anybody to query the data it hosts via a HTTP API.
+Moreover, a PDS provides a real-time stream of updates for the repositories it hosts via a WebSocket.
 Indexers (see Section~\ref{sec:indexing}) subscribe to this stream in order to find out about new or deleted records (posts, likes, follows, etc.) with low latency.
 This architecture is illustrated in Figure~\ref{fig:indexing}.
 
 Hosting a PDS for a small number of users requires only small computing resources, even if those users have a large number of followers.
 Users who wish to self-host their own PDS can therefore do so on a cheap virtual machine in the cloud, or even on a Raspberry Pi connected to their home internet router.
-However, we expect that most users will sign up for an account on a shared PDS run by a professional hosting provider~-- either Bluesky, PBC, or another company.
+However, we expect that most users will sign up for an account on a shared PDS run by a professional hosting provider~-- either Bluesky Social PBC, or another company.
 
 Compared to choosing a Mastodon server, the user's choice of PDS hosting provider is fairly inconsequential.
 The PDS URL is internal to the system, and is not normally visible to users.
 It makes no difference whether two users are on the same PDS or different PDSes, since interaction between users goes via the indexing infrastructure in any case.
-A user can migrate from one PDS to another by simply copying their repository to the new PDS, and pointing their account ID at the new PDS URL (see Section~\ref{sec:identity}).
+A user can migrate from one PDS to another by simply copying their repository and media files to the new PDS, and pointing their account ID at the new PDS URL (see Section~\ref{sec:identity}).
 Even if a PDS shuts down without warning, users can upload a backup of their repository to a new PDS, and thus recover their account without losing any of their posts or their social graph.
 
 PDS operators will generally want to perform some basic moderation by deleting any illegal content hosted on their servers.
 However, PDS-level moderation is much less important than server-level moderation in Mastodon, because in atproto, the primary moderation role is taken on by seperate actors in the system~-- the labelers and feed generators (see Section~\ref{sec:labeling}).
-This allows different sets of people to offer server hosting and moderation services, respectively; we believe this separation is valuable since operating a server and moderating a community require largely disjoint skill sets.
+This allows different sets of people to offer server hosting and moderation services, respectively; we believe this separation is valuable since operating a server and moderating a community require largely disjoint sets of skills.
 
-At the time of writing, Bluesky's indexing infrastructure (see Section~\ref{sec:indexing}) only indexes repositories on PDS instances hosted by Bluesky, PBC itself; like invitation codes, this limitation exists to limit infrastructure load and abuse problems during the private beta period.
+At the time of writing, Bluesky's indexing infrastructure (see Section~\ref{sec:indexing}) only indexes repositories on PDS instances hosted by Bluesky Social PBC itself; like invitation codes, this limitation exists to limit infrastructure load and abuse problems during the private beta period.
 In that sense, Bluesky is not yet fully decentralized.
 Support for third-party PDS operators is already implemented and enabled in Bluesky's \emph{sandbox} (testing) environment, and a PDS implementation suitable for self-hosting is already open source~\cite{BlueskyGithub}.
 We plan for the Bluesky indexing infrastructure to begin indexing repositories on other PDS operators (indicated by dashed arrows in Figure~\ref{fig:indexing}) in early 2024.
@@ -270,7 +280,7 @@ On the web, websites are crawled and indexed by search engines, which then provi
 The AT Protocol is inspired by this architecture: the repositories hosted by PDSes are analogous to websites, and the indexing infrastructure is analogous to a search engine.
 User repositories are primary data (the ``source of truth''), and the indexes are derived from the content of the repositories.
 
-At the time of writing, most of Bluesky's indexing infrastructure is operated by Bluesky, PBC (indicated by a shaded area in Figure~\ref{fig:indexing}).
+At the time of writing, most of Bluesky's indexing infrastructure is operated by Bluesky Social PBC (indicated by a shaded area in Figure~\ref{fig:indexing}).
 However, the company does not have any privileged access: since repositories are public, anybody can crawl and index them using the same protocols as our systems use.
 Client apps can switch to reading from a different index, or use a combination of multiple indexes.
 
@@ -278,8 +288,9 @@ While operating a small PDS is designed to be cheap, operating an indexer that i
 We therefore expect that there will be fewer hobbyist indexers than self-hosted PDSes.
 Nevertheless, as Bluesky grows, there are likely to be multiple professionally-run indexers for various purposes.
 For example, a company that performs sentiment analysis on social media activity about brands could easily create a whole-network index that provides insights to their clients.
+Web search engines can incorporate Bluesky activity into their indexes, and archivists such as the Internet Archive can preserve the activity for posterity.
 
-The indexing infrastructure operated by Bluesky, PBC is illustrated in Figure~\ref{fig:indexing}.
+The indexing infrastructure operated by Bluesky Social PBC is illustrated in Figure~\ref{fig:indexing}.
 It is composed of multiple services that have integration points for external services.
 
 \subsubsection{Big Graph Service (BGS)}\label{sec:bgs}
@@ -297,19 +308,23 @@ Any developers wanting to create a new social mode on top of atproto can define 
 
 \subsubsection{The App View}\label{sec:appview}
 
-The App View is a service that consumes the firehose, and processes the records belonging to the Bluesky social app (the \texttt{com.atproto} and \texttt{app.bsky} lexicons).
-For example, the App View counts the number of likes on every post, and it collects the set of replies to a particular post.
+The App View is a service that consumes the firehose, and processes the records that are relevant to the Bluesky social app (records in the \texttt{com.atproto} and \texttt{app.bsky} lexicons).
+For example, the App View counts the number of likes on every post, and it collates the thread of replies to each post.
 The App View also maintains the set of followers for each user, and constructs the timeline containing the posts by the accounts that each user is following.
-Finally, it offers a web service through which this information can be queried.
+It then offers a web service through which this information can be queried.
+When a record contains references to images, the App View fetches those files from the original PDS, resizes them if necessary to reduce the file size, and makes them available via a content delivery network (CDN).
 
-To display this information in the user's client app, the client queries the user's own PDS, which then fetches the neccessary data from the App View.
-The PDS personalizes the information from the App View to include details that are specific to the querying user, e.g.\ hiding posts from accounts that the user has muted, and indicating whether the user has already liked a given post.
-
-The App View is also responsible for enforcing moderation controls; for example, if one user has blocked another, the App View drops any attempts by the blocked users to interact with each other.
-If users are unhappy with the moderation rules applied by the App View operated by Bluesky, PBC, it is always possible for third parties to operate alternative App Views that index the same firehose and present the data in a different way.
+To display this information in the user's client app, the client queries the user's own PDS, which then fetches the neccessary data from an App View.
+The App View is also responsible for enforcing moderation controls: for example, if one user has blocked another, and one of the users' repositories contains a record of an interaction that should not have been allowed due to the block, then the App View drops that interaction so that nobody can see it in the client apps.
+This behavior is consistent with how blocking works on Twitter/X~\cite{TwitterBlock}, and it is also the reason why blocks are public records in Bluesky: every protocol-conforming App View needs to know who is blocking who in order to enforce the block~\cite{PublicBlocks,PrivateBlocks}.
+If users are unhappy with the moderation rules applied by the App View operated by Bluesky Social PBC, it is always possible for third parties to operate alternative App Views that index the same firehose and present the data in a different way.
 
 If the AT Protocol is used to implement another social mode besides microblogging, that application will most likely require an App View service of its own, which can be hosted by anyone.
 This service can then interpret and index the records in users' repositories in whatever way is required for that application.
+
+% Push notifications need to go through a service run by the developer of the client app.
+% For the official Bluesky app, the app view handles push notifications.
+% For 3rd-party clients we have an open interface for any client to register a user with their own push notification service, but at the moment they must generate the notifications themselves, e.g. by following the firehose. 
 
 \begin{figure*}
     \centering
@@ -326,12 +341,13 @@ This service can then interpret and index the records in users' repositories in 
 
 \subsection{Labelers and Feed Generators}\label{sec:labeling}
 
-The BGS and App View aim to provide a mostly ``unopinionated'' service: they compute indexes over the records in repositories in a neutral way, without attempting to rank or classify content.
+BGS and App View aim to provide a mostly ``unopinionated'' service: they compute indexes over repositories in a neutral way, without attempting to rank or classify content.
 However, a good user experience also requires ``opinionated'' judgements for the purposes of content filtering (e.g.\ detecting sexually explicit images or spam) and curation (e.g.\ selecting posts on a particular topic).
 
-The AT Protocol architecture seperates out the ``opinionated'' aspects of the system into separate services: \emph{labelers} and \emph{feed generators}.
+The AT Protocol seperates out the ``opinionated'' aspects of the system into separate services: \emph{labelers} and \emph{feed generators}.
 These services typically take the firehose as their input.
 Labelers produce a stream of judgements about content (e.g.\ ``this post is spam''), whereas feed generators return a list of post IDs they have selected for inclusion in a custom feed, as described in Section~\ref{sec:feeds}.
+Users can choose in their client app which feeds and which labelers they want to use.
 The output of labelers is consumed by App Views or PDSes in order to apply content filtering~\cite{Labeling}.
 For a feed generator, an App View expands the post IDs into full posts before sending them to the client app of users who have subscribed to that feed.
 
@@ -339,18 +355,16 @@ Having labeler and feed generator services that are separate from App Views has 
 \begin{itemize}
     \item Anyone can run such services, which enables a pluralistic ecosystem in which different parties may make different judgements about the same piece of content.
         Users, as well as the operators of App Views and PDSes, can decide whose judgements they want to trust, and it is easy for them to switch to alternative labeling and feed generation services if their current providers fail to meet their expectations.
-    \item It becomes easier to set up alternative App View providers: since any App View can consume the publicly available output from labelers and feed generators, there is no need for each App View to develop its own content filtering infrastructure.
-        Having alternative App Views besides the one operated by Bluesky, PBC, is important for a healthy, decentralized marketplace.
+    \item It becomes easier to set up alternative App View providers: since any App View can consume the publicly available output from labelers and feed generators, there is less pressure for each App View to develop its own content filtering infrastructure.
+        Having alternative App Views is important for a healthy, decentralized marketplace.
 \end{itemize}
 
-TODO: feed generator hosting services, and tools such as \url{https://github.com/skyfeed-dev/skyfeed-me}
-
-TODO: How is the output of labelers and feed generators consumed? Does it go to the user's PDS, or to the App View?
+Feed generators can be implemented in code using our starter kit~\cite{FeedGeneratorKit}, or created with a third-party service such as Skyfeed~\cite{Skyfeed}.
 
 \subsection{User Identity}\label{sec:identity}
 
-As explained in Section~\ref{sec:handles}, Bluesky and atproto rely on DNS domain names as user handles.
-This has the advantage that any number of identity providers can coexist in the system: Bluesky, PBC operates an identity provider that allows users to register subdomains of \texttt{.bsky.social}, but the indexing infrastructure treats users with those handles identically to accounts with any other handle.
+As explained in Section~\ref{sec:handles}, user handles in Bluesky and atproto are DNS domain names.
+Any number of identity providers can coexist in the system: Bluesky Social PBC allows users to register subdomains of \texttt{.bsky.social}, but the indexing infrastructure does not treat users differently based on their handle.
 
 We want a user to be able to change their handle without affecting their social graph.
 Therefore, when a record in user $A$'s repository indicates that $A$ is following $B$, that record must identify $B$ in a way that is more long-lived than specifying $B$'s handle.
@@ -382,12 +396,12 @@ The security of a \texttt{did:web} identity therefore assumes that the web hosti
 
 \texttt{did:web} identities are therefore similar to domain name handles, with the difference that the name cannot be changed, since a DID is an immutable identifier.
 This makes \texttt{did:web} appropriate for the identity of organizations that are already strongly linked to a particular domain name.
-For most individual users, \texttt{did:plc} is more appropriate, since it allows the domain name handle to be changed.
+For most users, \texttt{did:plc} is more appropriate, since it uses a domain name only as a handle that can be changed.
 
 \subsubsection{The did:plc DID method}
 
 When a user creates an account on the Bluesky social app, they are by default assigned a DID of the form \texttt{did:plc:eclio37ymobqex2ncko63h4r}, where the string after the prefix \texttt{did:plc:} is the SHA256 hash of the initial DID document, truncated to 120 bits and encoded using base32~\cite{did:plc}.
-A DID of this form can be resolved to the corresponding DID document by querying a server at \url{https://plc.directory/}, which is currently operated by Bluesky, PBC; in the future we plan to establish a consortium of independent operators that collectively provide the PLC directory service.
+A DID of this form can be resolved to the corresponding DID document by querying a server at \url{https://plc.directory/}, which is currently operated by Bluesky Social PBC; in the future we plan to establish a consortium of independent operators that collectively provide the PLC directory service.
 
 The PLC directory server is mostly untrusted because PLC DID documents are self-certifying.
 If the DID document has not changed since its initial creation, it is easy to verify that a DID has been correctly resolved to a DID document by recomputing its hash.
@@ -404,30 +418,9 @@ To mitigate the risk of such attacks, we anticipate that a future version of the
 In principle, the cryptographic keys for signing repository updates and DID document updates can be held directly on the user's devices, e.g.\ using a cryptocurrency wallet, in order to minimize trust in servers.
 However, we believe that such manual key management is not appropriate for most users, since there is a significant risk of the keys being compromised or lost.
 
-The Bluesky PDSes therefore hold these signing keys custodially on behalf of users% in a hardware security module (HSM) % TODO: is this correct?
-, and users authenticate themselves to their home PDS via username and password.
+The Bluesky PDSes therefore hold these signing keys custodially on behalf of users, and users authenticate themselves to their home PDS via username and password.
 This provides a familiar user experience to users, and enables standard features such as password reset by email.
 The AT Protocol does not make any assumptions about how PDSes authenticate their users, and other PDS operators are free to use different authentication methods.
-
-\subsection{TODO}
-
-How are images stored? When migrating an account to a new PDS, presumably images need to be moved along with the repo. Do viewers of an image fetch it from the PDS of the user who posted it, or from the App View?
-
-How does a PDS operator take down a ToS-violating post within a repo? Do they directly modify the repo and sign a new commit? How would this work if the signing key is not held custodially by the PDS, but rather by a client-side wallet?
-
-Do blocklists exist yet?
-
-Are keys held custodially by a PDS actually stored in a HSM? Is this why the same key is currently shared by all users on the same PDS? How will the key management change as a result of the PDS 2.0 architecture and the use of dedicated hardware in multiple locations? Will PDS 2.0 servers have HSMs?
-
-Are there push notifications? Which part of the system sends them?
-
-Do we want to talk about some kind of robots.txt-like mechanism through which users can specify preferences regarding crawling and indexing?
-
-Do we want to include some sort of discussion about business models? How do the operators of app views, labelers, etc.\ get paid?
-
-Discussion of censorship resistance, separaration of speech and reach
-
-Discussion of verifiable computaton? \url{https://blueskyweb.xyz/blog/3-6-2022-a-self-authenticating-social-protocol}
 
 \section{Related Work}\label{sec:related-work}
 
