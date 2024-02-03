@@ -28,7 +28,7 @@
     It was launched in private beta in February 2023, and has grown to over 3 million registered users in the following year.
     In this paper we introduce the architecture of Bluesky and the AT Protocol, which is inspired by the web itself, but modernized to include streams of real-time updates and cryptographic authentication.
     We explain how the technical design of Bluesky is informed by our goals: to enable decentralization by having multiple interoperable providers for every part of the system; to make it easy for users to switch providers; to give users agency over the content they see; and to provide a simple user experience that does not burden users with complexity arising from the system's decentralized nature.
-    The system's openness allows anybody to contribute to content moderation and community management, and we invite the web research community to use Bluesky as a dataset and testing ground for new approaches in social media moderation.
+    The system's openness allows anybody to contribute to content moderation and community management, and we invite the research community to use Bluesky as a dataset and testing ground for new approaches in social media moderation.
 \end{abstract}
 
 \maketitle
@@ -208,7 +208,7 @@ All data that a user wishes to publish is added to their \emph{repository}, whic
 Whenever a user performs some action~-- making a post, liking another user's post, following another user, etc.~-- that action becomes a record in their repository.
 Records are encoded in DAG-CBOR~\cite{DAG-CBOR}, a restricted form of CBOR~\cite{CBOR}, a compact binary data format.
 The schema of records is defined by the lexicon, and a repository may contain a mixture of records from several different lexicons, representing user actions in different social modes.
-Media files (e.g.\ images) are stored outside of the user's repository, but referenced by their CID~\cite{CID} (essentially a hash) from a record in the repository.
+Media files (e.g.\ images) are stored outside of the user's repository, but referenced by their CID~\cite{CID} (essentially a cryptographic hash) from a record in the repository.
 Similarly, a reference to a record in another repository (e.g.\ identifying a post being liked) also includes its CID.
 
 Each user account has one repository, and it contains all of the actions they have ever performed, minus any records they have explicitly deleted.
@@ -379,7 +379,7 @@ For most users, \texttt{did:plc} is more appropriate, since it uses a domain nam
 When a user creates an account on the Bluesky social app, they are by default assigned a DID of the form \texttt{did:plc:eclio37ymobqex2ncko63h4r}, where the string after the prefix \texttt{did:plc:} is the SHA256 hash of the initial DID document, truncated to 120 bits and encoded using base32~\cite{did:plc}.
 A DID of this form can be resolved to the corresponding DID document by querying a server at \url{https://plc.directory/}, which is currently operated by Bluesky Social PBC; in the future we plan to establish a consortium of independent operators that collectively provide the PLC directory service.
 
-The PLC directory server is mostly untrusted because PLC DID documents are self-certifying.
+The PLC directory server plays an authoritative role similar to the DNS root servers, but it is mostly untrusted because PLC DID documents are self-certifying.
 If the DID document has not changed since its initial creation, it is easy to verify that a DID has been correctly resolved to a DID document by recomputing its hash.
 To support changes to the DID document, the initial version of a user's DID document contains a public key that is authorized to sign a new version of the DID document.
 Any new version of the DID document is only valid if it has been signed by the key in the previous version.
@@ -480,8 +480,8 @@ This architecture has the advantage of not requiring a whole-network index.
 However, replies to a post notify the server of the original poster, but not necessarily every server that has a copy of the original post, leading to inconsistent reply threads on different servers.
 Notifications can be forwarded, but in the limit this leads to each server having a copy of the whole network, which would make it expensive to run a server.
 Viral posts can generate a lot of inbound requests to a server from people liking, replying, and boosting (reposting).
-The Bluesky indexing infrastructure is also fairly expensive, but a PDS is cheap.
-Since users can choose their moderation preferences independently from their indexing provider, we believe that the ecosystem can be healthy with a small number of indexing providers.
+The Bluesky indexing infrastructure is also fairly expensive, but a PDS is cheap to run.
+Since users can choose their moderation preferences independently from their indexing provider (App View), we believe that the ecosystem can be healthy with a small number of indexing providers.
 
 % Centralising tendency: for new users who don't have a dedicated server for their specific community, the default choice is to join one of the big servers.
 
@@ -493,12 +493,13 @@ While some decentralized systems prioritize censorship resistance, we believe th
 We therefore make moderation a first-class concern that is handled separately from infrastructure hosting, and we provide strong mechanisms for users to control the content they see.
 
 Our open architecture allows a pluralistic system in which there is no global consensus on what content is acceptable.
-A user on a self-hosted or loosely moderated PDS may post controversial content, but they are not entitled to the attention of others: App Views may choose not to index it, and clients may ignore it depending on the user's moderation settings.
+A user on a self-hosted or loosely moderated PDS may post controversial content, but they are not entitled to the attention of others: App Views may choose not to index the content, and clients may ignore it depending on the user's moderation settings.
 This philosophy is sometimes described as ``free speech, but not free reach''~\cite{DiResta:2018}.
 
 The AT Protocol provides cryptographically authenticated data, but our implementation pairs it with custodial key management to provide a familiar user experience.
 The system is open to third-party clients and alternative PDS hosts, and anybody can index the network using real-time streams for low-latency updates.
-It is also extensible to other social modes besides microblogging.
+This reduces the dependency on any one provider, since every part of the system can be run by multiple competing providers, and users can switch providers with minimal friction (in particular, without changing username, and without losing any of their content or social graph).
+The AT Protocol is also extensible to other social modes besides microblogging.
 
 % 3rd-party clients allow bsky pbc to offer a more curated, opinionated service with stronger moderation, protecting bsky brand
 % e.g. bsky own labelers mandatory
@@ -511,7 +512,7 @@ It is also extensible to other social modes besides microblogging.
 % Do we want to include some sort of discussion about business models? How do the operators of app views, labelers, etc. get paid?
 
 \begin{acks}
-    Martin Kleppmann is funded by the Volkswagen Foundation and crowdfunding supporters including Rohit Kulshreshtha, Mintter, and SoftwareMill.
+    Martin Kleppmann is supported by the Volkswagen Foundation and crowdfunding supporters including Mintter and SoftwareMill.
 \end{acks}
 
 \bibliographystyle{ACM-Reference-Format}
