@@ -92,10 +92,6 @@ There are also alternative feeds that show content on various topics, without th
 \end{figure}
 
 Bluesky launched an invite-only beta release in February 2023, and has grown to over 3~million registered users in January 2024, as shown in Figure~\ref{fig:user-growth}.
-At the time of writing, an invitation code is required to create an account, and codes are available through a waitlist or from an existing user.
-Such control over user signups may seem contradictory for a supposedly open and decentralized network, but it has been necessary to limit the load on our infrastructure and to keep abuse at a manageable level.
-We intend to remove the need for invite codes in early 2024.
-
 Bluesky Social PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source under the MIT license~\cite{BlueskyGithub}.
 The protocols they use are defined by open specifications~\cite{AtProtoSpecs}.
 Several parts of the system, such as feed generators (Section~\ref{sec:feeds}) and various alternative clients~\cite{AtProtoClients} are developed and operated by independent third parties.
@@ -245,7 +241,7 @@ PDS operators will generally want to perform some basic moderation by deleting a
 However, PDS-level moderation is much less important than server-level moderation in Mastodon, because in atproto, the primary moderation role is taken on by seperate actors in the system~-- the labelers and feed generators (see Section~\ref{sec:labeling}).
 This allows different sets of people to offer server hosting and moderation services, respectively; we believe this separation is valuable since operating a server and moderating a community require largely disjoint sets of skills~\cite{Roth:2023}.
 
-At the time of writing, Bluesky's indexing infrastructure (see Section~\ref{sec:indexing}) only indexes repositories on PDS instances hosted by Bluesky Social PBC itself; like invitation codes, this limitation exists to limit infrastructure load and abuse problems during the private beta period.
+At the time of writing, Bluesky's indexing infrastructure (see Section~\ref{sec:indexing}) only indexes repositories on PDS instances hosted by Bluesky Social PBC itself; this limitation exists to limit infrastructure load and abuse problems during the beta period.
 In that sense, Bluesky is not yet fully decentralized.
 Support for third-party PDS operators is already implemented and enabled in Bluesky's \emph{sandbox} (testing) environment, and a PDS implementation suitable for self-hosting is already open source~\cite{BlueskyGithub}.
 We plan for the Bluesky indexing infrastructure to begin indexing repositories on other PDS operators (indicated by dashed arrows in Figure~\ref{fig:indexing}) in early 2024.
