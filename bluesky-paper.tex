@@ -164,6 +164,12 @@ Bluesky is the social app with the features explained in Section~\ref{sec:produc
 We maintain this separation because the AT Protocol is designed to support multiple \emph{social modes}, not just Bluesky.
 For example, besides a Twitter-style microblogging app, atproto could also be used to implement Reddit-style forums, long-form blogs with comments, or domain-specific social applications such as link sharing or book reviews.
 The same user identity, social graph, and user data storage servers can be shared between all of these apps.
+% https://whtwnd.com/ is a blogging platform on top of atproto
+% open sourcing announcement: https://whtwnd.com/whtwnd.com/3kutsnrkgvk2o
+% https://frontpage.fyi/ is a HN clone
+% https://turntabl.app/
+% https://smokesignal.events/ is an events management system
+% Ask Jaz for more
 
 The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
 At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
@@ -468,6 +474,7 @@ ActivityPub~\cite{ActivityPub} is a W3C standard for social networking, and Mast
 We have highlighted aspects of their design in Sections~\ref{sec:introduction}, \ref{sec:feeds}, and \ref{sec:pds}.
 Mastodon gives a lot of power to server administrators: for example, a server admin can choose to block another server, preventing all communication between users on those servers. %, even those who were not involved in the disagreement that led to the blocking.
 There is a degree of lock-in to a server because moving to another server is intrusive: the username changes, moving posts to the new server currently requires an experimental command-line tool~\cite{MastodonPostMigration,MastodonContentMover}, and other users' replies to those posts are lost.
+% queer.af domain seized: https://akko.erincandescent.net/notice/AenoDMPN0SdVXSq9ZY
 These risks can be mitigated by self-hosting; managed providers exist~\cite{MastodonHosting}, but they still require some expertise and cost money.
 The AT Protocol separates the roles of moderation and hosting, and aims to make it easier to change providers.
 
