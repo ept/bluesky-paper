@@ -244,7 +244,7 @@ A user can migrate from one PDS to another by copying their repository and media
 Even if a PDS shuts down without warning, users can upload a backup of their repository to a new PDS, and thus recover their account without losing any of their posts or their social graph.
 
 PDS operators generally perform some basic moderation by deleting any illegal content hosted on their servers.
-However, PDS-level moderation is much less important than server-level moderation in Mastodon, because in atproto, the primary moderation role is taken on by seperate actors in the system~-- the labelers and feed generators (see Section~\ref{sec:labeling}).
+However, PDS-level moderation is much less important than server-level moderation in Mastodon, because in atproto, the primary moderation role is taken on by separate actors in the system~-- the labelers and feed generators (see Section~\ref{sec:labeling}).
 This allows different sets of people to offer server hosting and moderation services, respectively; we believe this separation is valuable since operating a server and moderating a community require largely disjoint sets of skills~\cite{Roth:2023}.
 
 \subsection{Indexing Infrastructure}\label{sec:indexing}
@@ -300,7 +300,7 @@ The App View also maintains the set of followers for each user, and constructs t
 It then offers a web service through which this information can be queried.
 When a record contains references to images, the App View fetches those files from the original PDS, resizes them if necessary to reduce the file size, and makes them available via a content delivery network (CDN).
 
-To display this information in the user's client app, the client queries the user's own PDS, which then fetches the neccessary data from an App View.
+To display this information in the user's client app, the client queries the user's own PDS, which then fetches the necessary data from an App View.
 The App View is also responsible for enforcing moderation controls: for example, if one user has blocked another, and one of the users' repositories contains a record of an interaction that should not have been allowed due to the block, then the App View drops that interaction so that nobody can see it in the client apps.
 This behavior is consistent with how blocking works on Twitter/X~\cite{TwitterBlock}, and it is also the reason why blocks are public records in Bluesky: every protocol-conforming App View needs to know who is blocking who in order to enforce the block~\cite{PublicBlocks,PrivateBlocks}.
 If users are unhappy with the moderation rules applied by the App View operated by Bluesky Social PBC, it is always possible for third parties to operate alternative App Views that index the same firehose and present the data in a different way.
@@ -317,7 +317,7 @@ The PDSes and relay can be reused.
 Relay and App View aim to provide a mostly ``unopinionated'' service: they compute indexes over repositories in a neutral way, without attempting to rank or classify content.
 However, a good user experience also requires ``opinionated'' judgements for the purposes of content filtering (e.g.\ detecting sexually explicit images or spam) and curation (e.g.\ selecting posts on a particular topic).
 
-The AT Protocol seperates out the ``opinionated'' aspects of the system into separate services: \emph{labelers} and \emph{feed generators}.
+The AT Protocol separates out the ``opinionated'' aspects of the system into separate services: \emph{labelers} and \emph{feed generators}.
 These services typically take the firehose as their input.
 Labelers produce a stream of judgements about content (e.g.\ ``this post is spam''), whereas feed generators return a list of post IDs they have selected for inclusion in a custom feed.
 Users can choose in their client app which feeds and which labelers they want to use.
