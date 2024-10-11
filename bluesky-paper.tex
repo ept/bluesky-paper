@@ -59,9 +59,9 @@
 
 \begin{abstract}
     Bluesky is a new social network built upon the AT Protocol, a decentralized foundation for public social media.
-    It was launched in private beta in February 2023, and has grown to over 6 million registered users by July 2024.
+    It was launched in private beta in February 2023, and has grown to over 10 million registered users by October 2024.
     In this paper we introduce the architecture of Bluesky and the AT Protocol, and explain how the technical design of Bluesky is informed by our goals: to enable decentralization by having multiple interoperable providers for every part of the system; to make it easy for users to switch providers; to give users agency over the content they see; and to provide a simple user experience that does not burden users with complexity arising from the system's decentralized nature.
-    The system's openness allows anybody to contribute to content moderation and community management. % and we invite the research community to use Bluesky as a dataset and testing ground for new approaches in social media moderation.
+    The system's openness allows anybody to contribute to content moderation and community management, and we invite the research community to use Bluesky as a dataset and testing ground for new approaches in social media moderation.
 \end{abstract}
 
 \begin{CCSXML}
@@ -106,10 +106,10 @@ In principle, a user can host their own server, but only a small fraction of soc
 
 The distinction between servers in Mastodon introduces complexity for users that does not exist in centralized services.
 For example, a user viewing a thread of replies in the web interface of one server may see a different set of replies compared to viewing the same thread on another server, because a server only shows those replies that it knows about~\cite{Adida:2022}.
-% As another example, when viewing the web profile of an account on another server, clicking the ``follow'' button does not simply follow that account; instead, the user needs to enter the hostname of their own server and be redirected to a URL on their home server before they can follow the account.
+As another example, when viewing the web profile of an account on another server, clicking the ``follow'' button does not simply follow that account; instead, the user needs to enter the hostname of their own server and be redirected to a URL on their home server before they can follow the account.
 In our opinion, it is undesirable to burden users with such complexity arising from the federated architecture.
 
-In this paper we introduce the \emph{AT Protocol} (atproto), a decentralized foundation for social networking, and \emph{Bluesky}, a Twitter-style social app built upon it.
+In this paper we introduce the \emph{AT Protocol} (atproto), a decentralized foundation for social networking, and \emph{Bluesky}, a Twitter-style microblogging app built upon it.
 A core design goal of atproto and Bluesky is to enable a user experience of the same or better quality as centralized services, while being open and decentralized on a technical level.
 %We introduce the user-facing features of Bluesky in Section~\ref{sec:product}, and in Section~\ref{sec:architecture} we explain the underlying systems architecture.
 The AT Protocol is designed such that for every part of the system there can be multiple competing operators providing interoperable services, making it easy to switch providers.
@@ -122,7 +122,7 @@ We hope that this architectural openness enables communities to develop their ow
 
 For example, researchers wanting to identify disinformation campaigns can easily get access to all content being posted, the social graph, and user profiles on Bluesky.
 If they are able construct an algorithm to label suspected disinformation, they can publish their labels in real time, and users who wish to see those labels can enable them in their client.
-% One goal of this paper is to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
+One goal of this paper is to bring Bluesky and the AT Protocol to the attention of researchers working on such algorithms, and to invite them to use the rapidly growing dataset of Bluesky content as a basis for their work.
 
 %\begin{figure}
 %   \centering
@@ -136,9 +136,10 @@ If they are able construct an algorithm to label suspected disinformation, they 
 
 Bluesky is a microblogging application in the style of Twitter/X. % (see Figure~\ref{fig:home-feed}).
 The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky~\cite{Graysky} and deck.blue~\cite{deck.blue}.
-Users can make public posts containing up to 300 characters of text, and up to four images, and they can interact with posts by replying, reposting, or liking.
+Users can make public posts containing up to 300 characters of text, up to four images, and short-form video.
+They can interact with posts by replying, reposting, or liking.
 A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
-% There are also alternative feeds that show content on various topics, without the user needing to follow the poster, which helps users discover each other.
+There are also alternative feeds that show content on various topics, without the user needing to follow the poster, which helps users discover each other.
 
 %\begin{figure}
 %   \centering
@@ -148,7 +149,7 @@ A user can also follow other users, and the default feed shows posts by accounts
 %   \label{fig:user-growth}
 %\end{figure}
 
-Bluesky launched an invite-only beta in February 2023, and has grown to over 6~million registered users in the following 18 months. % as shown in Figure~\ref{fig:user-growth}.
+Bluesky launched an invite-only beta in February 2023, and has grown to over 10~million registered users in the following 20 months. % as shown in Figure~\ref{fig:user-growth}.
 Bluesky Social PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source under the MIT license~\cite{BlueskyGithub}.
 The protocols they use are defined by open specifications~\cite{AtProtoSpecs}.
 Several parts of the system, such as feed generators and alternative clients~\cite{AtProtoClients} are developed and operated by independent third parties.
@@ -183,29 +184,26 @@ Instead, Bluesky and atproto use DNS domain names as handles.
 Users can sign up for a subdomain of \texttt{.bsky.social} for free.
 If a user already owns a domain name, they can claim it as their Bluesky handle by adding a DNS record or by hosting a file under a \texttt{/.well-known/} HTTPS URL on that domain~\cite{DomainHandle}.
 Users can also buy a new domain name within Bluesky, via a partnership with a domain registrar~\cite{PurchaseDomain}.
-
-% Using DNS domain names as handles has several advantages:
-% \begin{itemize}
-    % \item We leverage the existing infrastructure of ICANN, registrars, and name servers, including for example the dispute resolution procedures for trademarks.
-    % \item Domain names are a well-known concept even among non-technical users, and they are short and simple.
-    % \item A user can move to a different server without changing their handle (see Section~\ref{sec:identity}).
-    % \item Users do not need to host their own server to use their own domain name; a DNS record requires only a one-time setup and no ongoing maintenance.
-    % \item
-        For organizations and people that already have a well-known domain name, using that name makes it easy for users to check that their Bluesky account is genuine. For example, the New York Times' handle is \texttt{@nytimes.com}.
-    % \item
-        An organization can easily allow their staff to demonstrate their affiliation by granting them handles that are subdomains of the organization's main domain name. %(comparable to institutional email addresses). For example, a journalist's handle may indicate that they are at a particular news organization.
-    % \item Providers wanting to offer free subdomains can do so at very little cost.
-% \end{itemize}
+Domain names have several advantages:
+\begin{itemize}
+    \item We leverage the existing infrastructure of ICANN, registrars, and name servers, including for example the dispute resolution procedures for trademarks.
+    \item Domain names are a well-known concept even among non-technical users, and they are short and simple.
+    \item A user can move to a different server without changing their handle (see Section~\ref{sec:identity}).
+    \item Users do not need to host their own server to use their own domain name; a DNS record requires only a one-time setup and no ongoing maintenance.
+    \item For organizations and people that already have a well-known domain name, using that name makes it easy for users to check that their Bluesky account is genuine. For example, the New York Times' handle is \texttt{@nytimes.com}.
+    \item An organization can allow its staff to demonstrate their affiliation by granting them subdomains of the organization's main domain name (comparable to institutional email addresses). For example, a journalist's handle may indicate that they are at a particular news organization.
+    \item Offering free subdomains costs very little.
+\end{itemize}
 
 \paragraph{Custom Feeds and Algorithmic Choice}
 
 Several decentralized social networks offer only a reverse-chronological feed of posts from accounts the user is following~-- a backlash against the opaque recommendation algorithms used by mainstream social networks.
-Mastodon advertises itself as having ``no algorithms or ads to waste your time''~\cite{Mastodon}.
+For example, Mastodon advertises itself as having ``no algorithms or ads to waste your time''~\cite{Mastodon}.
 
 Our belief is that the problem lies not with algorithms \emph{per se}, but rather with centrally controlled, opaque algorithms that remove user agency and prioritize user engagement over all else, e.g.\ by promoting controversial posts.
 Good recommendation algorithms can help users discover content that is relevant to them and find new accounts to follow~-- especially important for new users who are not yet following many accounts.
+They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics, not all necessarily interesting to all followers.
 Our goal is to offer an open and diverse marketplace of algorithms in which communities can adapt the system to suit their needs, and users have more agency over how they spend their time and attention~\cite{AlgorithmicChoice}.
-% They are also helpful for surfacing content on a particular topic, whereas following a user means seeing all of their posts, which might be on a mixture of topics, not all necessarily interesting to all followers.
 % Giving users the ability to choose their algorithms lets them control what they want to see, rather than having the platform decide for them.
 
 Bluesky Social PBC offers a selection of feed algorithms of its own, and also allows anybody to create their own feed generator~\cite{CustomFeeds}.
@@ -230,7 +228,7 @@ The same user identity, social graph, and user data storage servers can be share
 % Ask Jaz for more
 
 The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
-% At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
+At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
 Anyone can define a new lexicon, allowing new social modes to coexist alongside the Bluesky social app on a shared infrastructure.
 The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate the process of specifying and versioning an interoperable protocol.
 
@@ -238,7 +236,7 @@ The biggest constraint for new social modes is that atproto is currently designe
 In particular, Bluesky user profiles, posts, follows, and likes are all public.
 Blocking actions are also currently public; we are investigating mechanisms for making these private~\cite{PublicBlocks,PrivateBlocks}.
 Private communications such as direct messages are currently handled outside of atproto; we plan to integrate them into the protocol in the future.
-% Only a small amount of user state is currently private: any muted accounts and threads, notifications and their read/unread status, and user preferences such as pinned feeds and content filtering settings.
+Only a small amount of user state is currently private: muted accounts and threads, notifications and their unread status, and user preferences such as content filtering settings.
 
 \begin{figure*}
     \centering
@@ -292,7 +290,7 @@ Indexers (see Section~\ref{sec:indexing}) subscribe to this stream in order to f
 This architecture is illustrated in Figure~\ref{fig:indexing}.
 
 Hosting a PDS for a small number of users requires only small computing resources, even if those users have a large number of followers.
-Users who wish to self-host their own PDS can therefore do so on a cheap virtual machine. % in the cloud, or even on a Raspberry Pi connected to their home internet router.
+Users who wish to self-host their own PDS can therefore do so on a cheap virtual machine in the cloud, or even on a Raspberry Pi connected to their home internet router.
 However, we expect that most users will sign up for an account on a shared PDS run by a professional hosting provider~-- either Bluesky Social PBC, or another company.
 
 Compared to choosing a Mastodon server, the user's choice of PDS hosting provider is fairly inconsequential.
@@ -313,10 +311,13 @@ User repositories are primary data (the ``source of truth''), and the indexes ar
 
 At the time of writing, most of Bluesky's indexing infrastructure is operated by Bluesky Social PBC (indicated by a shaded area in Figure~\ref{fig:indexing}).
 However, the company does not have any privileged access: since repositories are public, anybody can crawl and index them using the same protocols as our systems use.
-Client apps can switch to reading from a different index, or use a combination of multiple indexes.
+If Bluesky Social PBC were to violate users' expectations~-- for example, by censoring (omitting from the index) accounts that users wish to see~-- other parties would be free to provide their own indexes that do not perform this censorship.
+Client apps could switch to reading from a different index, or even use a combination of multiple indexes.
 
-While operating a small PDS is designed to be cheap, operating an indexer that ingests the entire network requires greater computing resources.
-We therefore expect that there will be fewer hobbyist indexers than self-hosted PDSes.
+In July 2024 (when Bluesky had 6 million users), it was possible to maintain a real-time copy of all user repositories on a single server for US\$153 per month~\cite{NewboldRelay}~-- expensive for a hobby project, but easily affordable by many organizations.
+This figure includes repository storage and the inbound bandwidth for fetching records from PDSes, but not the computational resources to build and serve summary indexes from that data.
+
+Due to the higher cost, we expect that there will be fewer hobbyist indexers than self-hosted PDSes.
 Nevertheless, as Bluesky grows, there are likely to be multiple professionally-run indexers for various purposes.
 For example, a company that performs sentiment analysis on social media activity about brands could easily create a whole-network index that provides insights to their clients.
 Web search engines can incorporate Bluesky activity into their indexes, and archivists such as the Internet Archive can preserve the activity for posterity.
@@ -329,6 +330,7 @@ It is composed of multiple services that have integration points for external se
 The first component is the \emph{Relay}, which crawls the user repositories on all known PDSes and consumes the streams of updates that they produce.
 The Relay checks the signatures and Merkle tree proofs on updates, and maintains its own replica of each repository.
 From this information, the Relay creates the \emph{firehose}: an aggregated stream of updates that notifies subscribers whenever records are added or deleted in any of the known repositories.
+Normally the WebSocket connection to PDSes provides the relay with low-latency notifications of repository changes, but in case of network interruptions the relay can also periodically re-crawl repositories and compare them to its local replica to determine what records have been added or deleted.
 
 The firehose is publicly available.
 Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the Relay performs some initial data cleaning such as discarding malformed updates and filtering out high-volume spam.
@@ -411,6 +413,8 @@ To prove ownership of a handle, the user must have a bidirectional link between 
     \item A link from the handle to the DID is established either by storing the DID in a DNS TXT record on that domain name, or by returning the DID in response to a HTTPS request to a \texttt{/.well-known/} URL on that domain name~\cite{DomainHandle}.
     \item A link from the DID to the handle is established by including the handle in the DID document that is returned when the DID is resolved.
 \end{itemize}
+The client app displays only handles for which this bidirectional link has been checked by the App View.
+Provided that the App View is honest and takes measures to protect against DNS poisoning attacks (perhaps using DNSSEC when available), this approach prevents users from impersonating domains that they do not own.
 
 \subsubsection{Resolving DID documents}
 
@@ -449,7 +453,7 @@ However, we believe that such manual key management is not appropriate for most 
 
 The Bluesky PDSes therefore hold these signing keys custodially on behalf of users, and users log in to their home PDS via username and password.
 This provides a familiar user experience to users, and enables standard features such as password reset by email.
-The AT Protocol does not make any assumptions about how PDSes authenticate their users; other PDS operators are free to use different methods.
+The AT Protocol does not make any assumptions about how PDSes authenticate their users; other PDS operators are free to use different methods, including user-managed keys.
 
 % \section{Related Work}\label{sec:related-work}
 
@@ -544,12 +548,15 @@ The AT Protocol does not make any assumptions about how PDSes authenticate their
 Bluesky and the AT Protocol are a new approach to social media.
 Their architecture is based on the principle that every part of the system can be run by multiple competing providers, and users can switch providers with minimal friction (in particular, without changing username, and without losing any of their content or social graph).
 For example, anyone can write a client, host a PDS, index the network, or provide moderation services, and all of these services interoperate.
-The AT Protocol is also extensible to other social modes besides microblogging.
+Even though the majority of Bluesky services are currently operated by a single company, we nevertheless consider the system to be decentralized because it provides \emph{credible exit}~\cite{NewboldProgress}: if Bluesky Social PBC goes out of business or loses users' trust, other providers can step in to provide an equivalent service using the same dataset and the same protocols.
+
+% The AT Protocol is also extensible to other social modes besides microblogging.
 
 While some decentralized systems prioritize censorship resistance, we believe that a good user experience requires explicitly addressing problematic content such as harassment and misinformation.
 We therefore make moderation a first-class concern that is handled separately from infrastructure hosting, and we provide strong mechanisms for users to control the content they see.
+Our open architecture allows a pluralistic system in which different users may choose different providers that uphold different values, while still allowing them to communicate and interoperate.
 
-% Our open architecture allows a pluralistic system in which there is no global consensus on what content is acceptable.
+% there is no global consensus on what content is acceptable.
 % A user on a self-hosted or loosely moderated PDS may post controversial content, but they are not entitled to the attention of others: App Views may choose not to index the content, and clients may ignore it depending on the user's moderation settings.
 % This philosophy is sometimes described as ``free speech, but not free reach''~\cite{DiResta:2018}.
 
