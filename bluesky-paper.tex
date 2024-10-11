@@ -158,9 +158,9 @@ Several parts of the system, such as feed generators and alternative clients~\ci
 
 % Bluesky currently has the following moderation mechanisms (additional mechanisms are under discussion~\cite{Moderation}):
 % \begin{description}
-    % \item[Content filtering:] Automated systems label potentially problematic content (such as images of a sexual or violent nature, posts promoting hate groups, or spam), and the app's preferences allow users to choose whether to show or hide content in each of these categories in their feeds.
+    % \item[Content filtering:] Automated systems label potentially problematic content (such as images of a sexual or violent nature, posts promoting hate groups, or spam), and the app's preferences allow users to choose whether to show or hide content in each of these categories in their feeds. Some filters are always applied regardless of user preferences.
     % \item[Mute:] A user can mute specific accounts or threads, which hides the muted content from their own feeds and notifications. The content continues to be visible to other users, and the target does not know that they were muted. A user can also publish a mutelist of accounts, and other users can subscribe to that list, which has the same effect as if they individually muted all of the accounts on the list.
-    % \item[Block:] One user can block another, which prevents all future interactions (such as mentions, replies, or reposts) between those accounts in addition to muting. Similarly to mutelists, a user can also publish a list of accounts, and other users can block all accounts on that list by subscribing to it.
+    % \item[Block:] One user can block another, which prevents all future interactions (such as mentions, replies, or reposts) between those accounts in addition to bidirectional muting. Similarly to mutelists, a user can also publish a list of accounts, and other users can block all accounts on that list by subscribing to it.
     % \item[Interaction gating:] A user who makes a post can restrict who is allowed to reply to it (anyone, anyone they follow, anyone mentioned in the post, and/or anyone on a particular list of accounts)~\cite{ReplyGating}.
     % \item[Takedown:] Users can report content that violates the terms of service to server operators, and the operators can take down violating media, posts, or accounts.
     % \item[Custom feeds:] While the aforementioned mechanisms provide negative moderation (helping users avoid content they do not want to see), feed generators (see Section~\ref{sec:feeds}) can actively select high-quality content.
@@ -189,7 +189,7 @@ Domain names have several advantages:
     \item We leverage the existing infrastructure of ICANN, registrars, and name servers, including for example the dispute resolution procedures for trademarks.
     \item Domain names are a well-known concept even among non-technical users, and they are short and simple.
     \item A user can move to a different server without changing their handle (see Section~\ref{sec:identity}).
-    \item Users do not need to host their own server to use their own domain name; a DNS record requires only a one-time setup and no ongoing maintenance.
+    \item Users do not need to host their own server to use their own domain name; they only need to maintain a DNS record.
     \item For organizations and people that already have a well-known domain name, using that name makes it easy for users to check that their Bluesky account is genuine. For example, the New York Times' handle is \texttt{@nytimes.com}.
     \item An organization can allow its staff to demonstrate their affiliation by granting them subdomains of the organization's main domain name (comparable to institutional email addresses). For example, a journalist's handle may indicate that they are at a particular news organization.
     \item Offering free subdomains costs very little.
@@ -333,7 +333,7 @@ From this information, the Relay creates the \emph{firehose}: an aggregated stre
 Normally the WebSocket connection to PDSes provides the relay with low-latency notifications of repository changes, but in case of network interruptions the relay can also periodically re-crawl repositories and compare them to its local replica to determine what records have been added or deleted.
 
 The firehose is publicly available.
-Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the Relay performs some initial data cleaning such as discarding malformed updates and filtering out high-volume spam.
+Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the Relay performs some initial data cleaning such as discarding malformed updates and filtering out illegal content and high-volume spam.
 The firehose can optionally include Merkle proofs and signatures along with records, allowing subscribers to check that they are authentic.
 
 The Relay does not interpret or index the records in repositories, but simply stores and forwards them.
@@ -413,7 +413,7 @@ To prove ownership of a handle, the user must have a bidirectional link between 
     \item A link from the handle to the DID is established either by storing the DID in a DNS TXT record on that domain name, or by returning the DID in response to a HTTPS request to a \texttt{/.well-known/} URL on that domain name~\cite{DomainHandle}.
     \item A link from the DID to the handle is established by including the handle in the DID document that is returned when the DID is resolved.
 \end{itemize}
-The client app displays only handles for which this bidirectional link has been checked by the App View.
+The App View periodically checks these bidirectional links, and invalidates the handle if either is broken.
 Provided that the App View is honest and takes measures to protect against DNS poisoning attacks (perhaps using DNSSEC when available), this approach prevents users from impersonating domains that they do not own.
 
 \subsubsection{Resolving DID documents}
