@@ -137,9 +137,9 @@ One goal of this paper is to bring Bluesky and the AT Protocol to the attention 
 Bluesky is a microblogging application in the style of Twitter/X. % (see Figure~\ref{fig:home-feed}).
 The ``official'' client app is available on iOS, Android, and the web; several independently developed client apps are also available, such as Graysky~\cite{Graysky} and deck.blue~\cite{deck.blue}.
 Users can make public posts containing up to 300 characters of text, up to four images, and short-form video.
-They can interact with posts by replying, reposting, or liking.
-A user can also follow other users, and the default feed shows posts by accounts that the user is following in reverse chronological order.
-There are also alternative feeds that show content on various topics, without the user needing to follow the poster, which helps users discover each other.
+They can interact with posts by replying, reposting, or liking, and they can follow other users.
+By default users have two feeds: one showing posts by followed accounts in reverse chronological order, and one recommending popular content across the network.
+Users can also choose from many alternative feeds that show content on various topics, as explained below.
 
 %\begin{figure}
 %   \centering
@@ -150,7 +150,7 @@ There are also alternative feeds that show content on various topics, without th
 %\end{figure}
 
 Bluesky launched an invite-only beta in February 2023, and has grown to over 10~million registered users in the following 20 months. % as shown in Figure~\ref{fig:user-growth}.
-Bluesky Social PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source under the MIT license~\cite{BlueskyGithub}.
+Bluesky Social PBC (a public-benefit corporation) develops the official client app and operates the core services; the client and several server-side components are open source, dual-licensed under the MIT and Apache 2.0 licenses~\cite{BlueskyGithub}.
 The protocols they use are defined by open specifications~\cite{AtProtoSpecs}.
 Several parts of the system, such as feed generators and alternative clients~\cite{AtProtoClients} are developed and operated by independent third parties.
 
@@ -227,16 +227,16 @@ The same user identity, social graph, and user data storage servers can be share
 % https://smokesignal.events/ is an events management system
 % Ask Jaz for more
 
-The data types and concepts for a particular social mode are defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved in providing that social mode~\cite{AtProtoSpecs}.
-At the moment, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), and the \texttt{app.bsky} lexicon defines the microblogging mode.
+A social mode is defined by a \emph{lexicon}, which specifies the schema of the data and the request endpoints involved~\cite{AtProtoSpecs}.
+Several lexicons are currently used: for example, the \texttt{com.atproto} lexicon defines the core AT Protocol concepts such as user identity (Section~\ref{sec:identity}), the \texttt{app.bsky} lexicon defines the microblogging mode, and the \texttt{tools.ozone} lexicon supports moderation actions~\cite{BlueskyLexicons}.
 Anyone can define a new lexicon, allowing new social modes to coexist alongside the Bluesky social app on a shared infrastructure.
-The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate the process of specifying and versioning an interoperable protocol.
+The purpose of a lexicon is to provide documentation, to allow code generation and type-checking in applications, and to facilitate schema evolution for long-term compatibility and interoperability.
 
-The biggest constraint for new social modes is that atproto is currently designed for content that users want to make publicly available.
+The biggest constraint for new social modes is that atproto is currently designed for content that users want to make public.
 In particular, Bluesky user profiles, posts, follows, and likes are all public.
 Blocking actions are also currently public; we are investigating mechanisms for making these private~\cite{PublicBlocks,PrivateBlocks}.
-Private communications such as direct messages are currently handled outside of atproto; we plan to integrate them into the protocol in the future.
 Only a small amount of user state is currently private: muted accounts and threads, notifications and their unread status, and user preferences such as content filtering settings.
+Private communications (direct messages) are currently handled by a centralized service run by Bluesky Social PBC; we plan to decentralize this component in the future.
 
 \begin{figure*}
     \centering
@@ -333,8 +333,8 @@ From this information, the Relay creates the \emph{firehose}: an aggregated stre
 Normally the WebSocket connection to PDSes provides the relay with low-latency notifications of repository changes, but in case of network interruptions the relay can also periodically re-crawl repositories and compare them to its local replica to determine what records have been added or deleted.
 
 The firehose is publicly available.
-Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the Relay performs some initial data cleaning such as discarding malformed updates and filtering out illegal content and high-volume spam.
-The firehose can optionally include Merkle proofs and signatures along with records, allowing subscribers to check that they are authentic.
+Consuming the firehose is an easier way of building an index over the whole network, compared to directly subscribing to the source PDSes, since the Relay performs some initial data cleaning (discarding malformed updates, filtering out illegal content and high-volume spam).
+The firehose includes Merkle proofs and signatures along with records, allowing subscribers to check that they are authentic.
 
 The Relay does not interpret or index the records in repositories, but simply stores and forwards them.
 Any developers wanting to create a new social mode on top of atproto can define a new lexicon with new record types, and these records can be stored in existing repositories and aggregated in the firehose without requiring any changes to the Relay.
@@ -361,6 +361,7 @@ It then offers a web service through which this information can be queried.
 When a record contains references to images, the App View fetches those files from the original PDS, resizes them if necessary to reduce the file size, and makes them available via a content delivery network (CDN).
 
 To display this information in the user's client app, the client queries the user's own PDS, which then fetches the necessary data from an App View.
+% Devin confirms this is correct. The reason it goes through the PDS is to authenticate the request to the App View, so the App View can verify which user it's serving.
 The App View is also responsible for enforcing moderation controls: for example, if one user has blocked another, and one of the users' repositories contains a record of an interaction that should not have been allowed due to the block, then the App View drops that interaction so that nobody can see it in the client apps.
 This behavior is consistent with how blocking works on Twitter/X~\cite{TwitterBlock}, and it is also the reason why blocks are public records in Bluesky: every protocol-conforming App View needs to know who is blocking who in order to enforce the block~\cite{PublicBlocks,PrivateBlocks}.
 If users are unhappy with the moderation rules applied by the App View operated by Bluesky Social PBC, it is always possible for third parties to operate alternative App Views that index the same firehose and present the data in a different way.
