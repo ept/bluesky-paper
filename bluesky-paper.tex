@@ -487,7 +487,7 @@ An atproto PDS has similarities to Git repository hosting (e.g.\ GitHub/Gitlab) 
 
 \subsection{Scuttlebutt}
 
-Secure Scuttlebutt (SSB) is a peer-to-peer social networking protocol~\cite{Scuttlebutt}; Manyverse~\cite{Manyverse} and Planetary~\cite{Planetary} are social applications built upon the SSB protocol.
+Secure Scuttlebutt (SSB) is a peer-to-peer social networking protocol~\cite{Scuttlebutt}; Manyverse~\cite{Manyverse} is a social application built upon the SSB protocol.
 It optionally uses relay servers called \emph{pubs} to store messages from peers that are offline, and to enable user discovery.
 The client software downloads the feeds from accounts that the user is explicitly following, and from accounts followed by followed accounts (up to three hops by default).
 This can require significant amounts of storage and bandwidth on the client.
@@ -500,7 +500,7 @@ This requires more explicit moderation to manage unwanted content, but we believ
 Since SSB is built upon append-only logs and gossip replication, it is not possible to delete content once it has been posted~\cite{SSBDeletion}.
 User identity is tied to a cryptographic key on the user's device, requiring manual key management for moving to another device.
 Posting from multiple devices is not possible, as sharing the same key between devices can make an account unrecoverable~\cite{SSBMultiDevice}.
-A work-in-progress successor protocol to SSB, called PPPPP, is designed to address these issues~\cite{PPPPP}.
+A successor protocol to SSB, called PZP, is designed to address these issues~\cite{PZP}.
 
 \subsection{Nostr}
 
@@ -541,16 +541,16 @@ Linking social accounts to cryptocurrency wallets and NFTs enables users to mone
 ActivityPub~\cite{ActivityPub} is a W3C standard for social networking, and Mastodon~\cite{Mastodon} is its most popular implementation.
 Mastodon gives a lot of power to server administrators: for example, a server admin can choose to block another server, preventing all communication between users on those servers. %, even those who were not involved in the disagreement that led to the blocking.
 There is a degree of lock-in to a server because moving to another server is intrusive: the username changes, moving posts to the new server currently requires an experimental command-line tool~\cite{MastodonPostMigration,MastodonContentMover}, and other users' replies to those posts are lost.
-% queer.af domain seized: https://akko.erincandescent.net/notice/AenoDMPN0SdVXSq9ZY
+If the old server is not reachable~-- for example, because its admin shut it down without warning or because its domain was seized~\cite{QueerAF}~-- the user's social graph is lost.
 These risks can be mitigated by self-hosting; managed providers exist~\cite{MastodonHosting}, but they still require some expertise and cost money.
-The AT Protocol separates the roles of moderation and hosting, and aims to make it easier to change providers.
+The AT Protocol separates the roles of moderation and hosting, and aims to make it easier to change providers without losing any data.
 
 When user $A$ follows user $B$, $A$'s server asks $B$'s server to send it notifications of $B$'s future posts via ActivityPub.
 This architecture has the advantage of not requiring a whole-network index.
 However, replies to a post notify the server of the original poster, but not necessarily every server that has a copy of the original post, leading to inconsistent reply threads on different servers.
 Notifications can be forwarded, but in the limit this leads to each server having a copy of the whole network, which would make it expensive to run a server.
 Viral posts can generate a lot of inbound requests to a server from people liking, replying, and boosting (reposting).
-The Bluesky indexing infrastructure is also fairly expensive, but a PDS is cheap to run.
+In comparison, the Bluesky indexing infrastructure is also fairly expensive, but a PDS is cheap to run.
 Since users can choose their moderation preferences independently from their indexing provider (App View), we believe that the ecosystem can be healthy with a small number of indexing providers.
 
 % Centralising tendency: for new users who don't have a dedicated server for their specific community, the default choice is to join one of the big servers.
